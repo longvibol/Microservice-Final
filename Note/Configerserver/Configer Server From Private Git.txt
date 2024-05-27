@@ -1,0 +1,168 @@
+-- Configer Server From Private Git Hub ---
+
+1. change the application.properties 
+
+spring.cloud.config.server.git.uri=https://github.com/longvibol/bank-config-server-private.git (private repo)
+spring.cloud.config.server.git.username=vibollong
+spring.cloud.config.server.git.password=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
+
+2. Get the tokent from Git hub  
+- Go to Settint -> Developer Settings -> Personal access tokens -> Tokens (classic) -> Generate new tokent and set the role! 
+
+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
+
+
+--- Refree Service ---
+
+Why we need it ? (we want to change the information in our server :
+យើងមិនចង់ restart service យើងដោយសារសារតែទេ 
+
+- Don't want to deploy the serveice again 
+- Effect to the system while runing the server 
+- some server no need to update 
++ location to put the refresh in each Server (account, loan, card...) 
+
+ចឹងពេលយើង ធ្វើការកែប្រែក្នុង Service យើងអាចអោយវា update បានដោយមិនចាំបាច់បិទ
+
+Step to set up in each service: 
+
+1. Add dependency 
+
+<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-actuator</artifactId>
+</dependency>
+
+2. Add anotatoin : @RefreshScope in main app
+
+@RefreshScope
+@SpringBootApplication
+public class AccountApplication {
+
+	public static void main(String[] args) {
+		SpringApplication.run(AccountApplication.class, args);
+	}
+
+}
+
+3. In order to refresh without restart service. we setup POST to the service we setup 
+
+POST: http://localhost:8080/actuator/refresh
+
+========================================================  
+
+--- Encrypt --- Security purpose 
+
+1. Add encrypt key in application.properties "in configserver" 
+
+encrypt.key=vibollong
+
+2. In Post main: 
+
++ POST: localhost:8071/encrypt 
+
+Select: raw and text --> put the text we want Add " dev-account@piseth.com " 
+
++ POST: localhost:8071/decrypt
+
+75ed2fdfc4ab7b534f1d1b8513504c804ec9bee0913de8c512cf7aa7853e3ecc2c3497ac04d7242366939d65916d46e7
+
+3. Put the decrpt note " {cipher} + ...." 
+
+{cipher}75ed2fdfc4ab7b534f1d1b8513504c804ec9bee0913de8c512cf7aa7853e3ecc2c3497ac04d7242366939d65916d46e7
+
+===================================
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

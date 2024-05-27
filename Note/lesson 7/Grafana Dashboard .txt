@@ -1,0 +1,146 @@
+Grafana Dashboard 
+
+there are two ways to setup dashboard to monitor our service:
+
+1. templet dashboard from Grafana 
+
+https://grafana.com/grafana/dashboards/
+
+- Search dashboard we want : example : JVM 
+
+copy url:
+
+https://grafana.com/grafana/dashboards/4701-jvm-micrometer/
+
+- go to grafana : localhoust:3000
+
+http://localhost:3000/login
+
+User: admin
+Pass: admin
+
+- go to home dashboard > New > New Dashboard > Import dashboard > path the Url : https://grafana.com/grafana/dashboards/4701-jvm-micrometer/
+
+
+2. Add Dashboard by ourselve 
+
+- go to home > dashboard > new dashboard > Add visualization > select data source > Prometheus 
+
+Metric (where you want to add the monitor)
+Label filters ( Applicatoin, instance, job)
+Select value (your service)
+
+
+=============== Create Alter in Grafana ============ 
+
+1. hookdeck.com 
+
+Create Connection > Create source > Send requests to Hookdeck > git URL
+
+https://hkdk.events/mzwih2lak1a0z2
+
+2. Go go Grafana:http://localhost:3000/alerting/list
+
+Alert Rules > New alert rule > 
+
+A = Metric (Up) , Label Filters (job) == account
+
+B = Reduce (input A) , Function = Last , Mode = Strict 
+
+C = threshold , input B = is below = 0; 
+
+(10s for down --> 10s for fire)
+
+2. Create Contact
+
+- Contact points : integration select Webhook 
+
+Setup Link URL : https://hkdk.events/mzwih2lak1a0z2
+
+- Test send to hookdeck!
+
+
+=================================================================================
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+SMTP 
+Telegram 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

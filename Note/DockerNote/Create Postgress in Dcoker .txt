@@ -1,0 +1,109 @@
+Create Postgress in Dcoker 
+
+1. Create Folder for dockerfiel 
+2. name the file to "Dockerfile"
+3. create Dockerfile by command code 
+
+Note: 
+--- search key work " docker postgres create database ---
+
+4. Setup connection to jar code in the application.properties (Maven project) 
+
+server.port = 5050
+
+spring.datasource.url= jdbc:postgresql://localhost:5438/account_service
+spring.datasource.username = account
+spring.datasource.password= account123
+
+spring.jpa.properties.hibernate.jdbc.lob.non_contextual_creation=ture
+spring.jpa.properties.hibernate.dialect= org.hibernate.dialect.PostgreSQLDialect
+spring.jpa.hibernate.ddl-auto=update
+
+
+5. Go to Dockerfile 
+
+================ Code in Dockerfile connect to postgress
+
+FROM postgres:14-alpine
+ENV POSTGRES_USER account
+ENV POSTGRES_PASSWORD account123
+ENV POSTGRES_DB account_service 
+
+
+================= **** 
+
+6. build the docker postgress file from Dockerfile 
+>> docker build . -t postgres_db_23 (name of the docker image)  
+>> docker images ( check images after buil ) 
+
+Now we have docker file show: postgres_db_23      latest    c17be2f153b1   5 weeks ago    239MB
+
+>> docker run -d -p 5438:5432 postgres_db_23 
+>> docker ps 
+
+41df509330c4   postgres_db_23      "docker-entrypoint.s…"   About a minute ago   Up About a minute   0.0.0.0:5438->5432/tcp   recursing_taussig
+
+>> docker logs 41df509330c4
+
+2024-03-21 04:00:59.481 UTC [1] LOG:  database system is ready to accept connections
+
+Restul the docker image waiting to connect to pgAdmin 
+---------------------------
+
+Crete pgAdmin from pg admin : 
+
+1. right click on Sercer -> Register Server 
+
++ General 
+name : postgres_db
+
++ Connection 
+Host name/address : localhost (0.0.0.0:5438->5432/tcp)
+Port : 5438 
+Maintenance databse: 
+username : account
+password: acount123 
+
+--- get these information from Dockerfile setup :
+
+FROM postgres:14-alpine
+ENV POSTGRES_USER account
+ENV POSTGRES_PASSWORD account123
+ENV POSTGRES_DB account_service 
+
+
+------------------ Therefore we can test from postmanh ! 
+
+
+*** Now we want to connect from docker image to docker (no need to run from cmd) 
+1. buile image file again for docker container 
+>> docker build . -t account_service 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 

@@ -1,0 +1,36 @@
+Push Docker Fild to Dockerhub
+
+1. Log in 
+
+docker login -u "vibollongW" -p "Mondy@1689"
+
+2. goto website dockerbub : https://hub.docker.com/
+
+Create Repository -> put the name we want to create 
+- docker push vibollong/loan:tagname
+
+3. Check the file in the docker destop 
+
+>> docker push vibollong/loan:tagname
+
+Ex: >> docker push vibollong/loan:v2
+
+4. Maven build images 
+
+>> mvn compile jib:dockerBuild 
+
+---------------------- Plugin 
+
+<plugins>
+			<plugin>
+				<groupId>com.google.cloud.tools</groupId>
+				<artifactId>jib-maven-plugin</artifactId>
+				<version>3.3.2</version>
+				<configuration>
+					<to>
+						<image>vibollong/${project.artifactId}:v2</image>
+					</to>
+				</configuration>
+			</plugin>
+
+---------------------- 

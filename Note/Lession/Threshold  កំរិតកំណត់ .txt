@@ -1,0 +1,86 @@
+Threshold : កំរិតកំណត់ 
+Eureka Self-Preservation mode : 
+
+
+--- Create Service in Docker:
+>> mvn clean package 
+
+Build our service one by one in the docoker from the docker file inside the application: 
+
+
+>>docker build . -t configserver : 8000:8071
+>>docker build . -t eurekaserver : 9000:9000
+>>docker build . -t account : 7000:8080
+>>docker build . -t loan : 6000:8090
+>>docker build . -t card : 5000:8070
+
+
+-------------- Create Mongo in Docker : 
+
+mvn clean package
+
+1. Pull from docker hub 
+
+docker pull mvertes/alpine-mongo
+
+2. run mongodb on port 7777 
+
+docker run -p 7777:27017 mvertes/alpine-mongo
+
+3. Connect to MongoCompass 
+
+in mongo compass : mongodb://localhost:7777 = connection  
+
+4. to stop docker 
+
+docker stop ac748dfe7f26
+
+------------------- Create Postgres in Docker
+
+docker pull postgres
+
+
+----- វិធីកែ hostname running 
+
+*** ជួបអក្សរតូចដាក់អក្សរធំ , ជួប . ដាក់ _ 
+
+Ex: 
+spring.data.mongodb.host=${MONGODB_HOST_NAME:localhost}
+
+
+-- pg admin docker pull
+
+
+docker pull dpage/pgadmin4
+
+
+--- postgres
+
+docker pull postgres
+
+--- mongo 
+
+docker pull mvertes/alpine-mongo
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

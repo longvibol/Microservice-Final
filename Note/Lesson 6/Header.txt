@@ -1,0 +1,144 @@
+- Headder we can add as many we want but body if we want to add to need to rewirte code 
+- for the response time header there are many kind for example we can use 
+
+X-Response-Time HTTP respone header 
+
+- Search Respond Header 
+
++ can add header to the server accrose api geteway 
++ add repson time 
++ Audit user 
++ log time in , log time out 
++ redirect url 
+
+Check more API gate way in Spring Cloud gateway:
+
+https://cloud.spring.io/spring-cloud-gateway/reference/html/
+
+- There are two style : yml and java but java is the best flecible 
+
+Ex:
+
+@Bean
+	public RouteLocator myRoutes(RouteLocatorBuilder builder) {
+	    return builder.routes()
+	        .route(p -> p
+	            .path("/vibolbank/account/**")
+	            .filters(f -> f.rewritePath("/vibolbank/account/(?<segment>.*)","/${segment}")
+	            .addResponseHeader("X-RESPONSE-TIME", LocalDateTime.now().toString()))
+	            		
+	            .uri("lb://ACCOUNT")).
+	        route(p -> p
+		            .path("/vibolbank/loan/**")
+		            .filters(f -> f.rewritePath("/vibolbank/loan/(?<segment>.*)","/${segment}"))
+		            		
+		            .uri("lb://LOAN")).
+	        route(p -> p
+		            .path("/vibolbank/card/**")
+		            .filters(f -> f.rewritePath("/vibolbank/card/(?<segment>.*)","/${segment}"))
+		            		
+		            .uri("lb://CARD")).build();
+	}
+
+
+------------ where we can see what we can customize : 
+.route(p -> p
+	            .path("/vibolbank/account/**")
+	            .filters(f -> f.rewritePath("/vibolbank/account/(?<segment>.*)","/${segment}")
+	            .addResponseHeader("X-RESPONSE-TIME", LocalDateTime.now().toString())
+
+		**********.)
+----------------------
+
+Customze file in the API gate way: 
+Example on CCC (Cros cutting Concern) Tracing and logging 
+
+* Create correlationId for tracing 
+
+Tracing តាមដាន់ (tracing in programming ) 
+
+ប្រើសម្រាប់តាមដាន់ពេលមានបញ្ហា តើយើងត្រូវមើលមួយណា?
+
+account ->  loan 
+	->  card -> call dto another 
+
+we need to create :
+
+correlationId : 9988779 to put all the accout loan card. 
+តើមានលេខ id នឹងវាមានបានហៅទៅគ្រប់ service នឹងអត់
+
+https://github.com/pisething/microservices_course/blob/day_20_custom_filter/gatewayserver/src/main/java/com/piseth/bank/gatewayserver/GatewayserverApplication.java
+
+
+============>>>
+
+
+Step to create correlation id to all the service call:
+
+1. RequestTracingFilter ពេលចូល
+2. ResponseTracingFilter​ ពេលចេញ 
+
+Pre filter -> each service -> Post Filter 
+
+- Spring colud Get way : it build on top of Spring Web Flud : Reactive and Non-Blocking code 
+
+https://docs.spring.io/spring-framework/reference/web/webflux.html
+
+- It return type only one 
+- Need to lean Java Reactive 
+
+
+Note: 
+
+Mono<Void> = មានន័យថា មួយ signle object 
+Flux= collection data 
+
+
+======================= Generatate Auto Tracking Number
+
+Think about the logic 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

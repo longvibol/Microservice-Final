@@ -1,0 +1,260 @@
+Challenge 7 : Observability and Monitoring 
+
+- Trace transaction across multiple service
+- combine all the logs form multiple service 
+- How to monitoring performace of the service calls? 
+- Monitoring Metrics (CUP, network, Ram and health
+
+Observability vs Monitoring 
+
+**** Observabiltiy = សង្កេត ថាតើ វាមានបញ្ហាមកពីអ្វី Collecting and analyzing data
+Three pillars of the observability :
+
+1. Metrics : CPU usage, memory usage, and response times. 
+
+2. Logs : ជា record នៃព្រឹត្តិការណ៍ដែលយើងបានដាក់ system 
+
+3. Traces: record path tracing 
+
+
+ 
+*** Monitoring = alert and identify the troubleshoot problems 
+
+- Identify and troubleshooting problems
+- Track the health of your microservices តាមដាន់សុខភាពរបស់ service នីមួយៗ
+- Optimize your microservices: ឧទាហរណ៍ថា service យើងវា connecto to DB ច្រើនដល់ពេកចឹង យើងត្រូវធ្វើការប្តូរ Algorithem vir 
+
+Monitoring is reacting to problems while observability is fixing them in real time. 
+
++ Logs: record of events that happen in software applications over time
+type : trace, debug, info, warn, and error. 
+
+- in monolithic apps : all of the code is in a single codebase. 
+- in Microservices   : centralized logging all of the service log 
+
+==> we use Grafana open-source analytics and interatice visualization web application. 
+
+- Grafana is a popular tool for visualizing metrics, logs, traces from a variety of sources. 
+
++ Loki 
++ Promtail : lightweight log agent that ships logs from your containers to loki. 
+
+Hight level:
+
+1. Promtail fetches logs from the Microservice then it forward logs to Loki (storage text : log aggregation system)
+
+2. Grafana is the Query, search, visualize the logs from Loki  
+
+------------------ Install Grafana Loki 
+
+https://grafana.com/docs/loki/latest/setup/install/docker/
+
+========================= Observation Lesson ======================================= 
+
+1. Actuator : it show the metrics of the service and heathlty check 
+It produce the JSON formart and use HTTP endpoints or JMX beans to show us! 
+
+2. Micrometer: automatically expose/actuator/metrics data into something you monitoring system can understand. 
+All you need to do is include that vendor-specific micrometer dependency in your application. 
+ 
+Example: prometheus (is the Micrometer) 
+
+* dependency in spring boot:  
+
+		<dependency>
+			<groupId>io.micrometer</groupId>
+			<artifactId>micrometer-registry-prometheus</artifactId>
+		</dependency>
+
+* application.property: 
+
+management.endpoints.web.exposure.include=*
+management.info.env.enabled=true
+management.endpoint.shutdown.enabled=true
+management.metrics.tags.application: ${spring.application.name}
+
+
+------------------------------------------- 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

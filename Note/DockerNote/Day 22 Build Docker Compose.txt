@@ -1,0 +1,121 @@
+-- Build Docker Compose --
+1. Rabbitmq
+2. Configserver
+3. Readyness and liveness
+4. mongodb
+
+>> docker pull mvertes/alpine-mongo
+
+================================= 
+
+version: "3.8"
+services:
+  rabbit:
+    image: rabbitmq:3.13-management
+    hostname: rabbitmq
+    container_name: rabbit
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    healthcheck:
+      test: rabbitmq-diagnostics check_port_connectivity
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+    networks:
+      - vibolnetwork
+
+  configserver:
+    image: configserver:v2
+    mem_limit: 700m
+    container_name: configserver-ms
+    healthcheck:
+      test: "curl --fail --silent localhost:8071/actuator/health/readiness | grep UP || exit 1"
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+    ports:
+      - "8071:8071"
+    depends_on:
+      rabbit:
+        condition: service_healthy
+    environment:
+      SPRING_RABBITMQ_HOST: rabbit
+    networks:
+      - vibolnetwork
+
+  mongodb:
+    image: mvertes/alpine-mongo:latest
+    container_name: mongo
+    ports:
+      - "7777:27017"
+    volumes:
+      - './data:/data/db'
+    networks:
+      vibolnetwork:
+        aliases: 
+          - mongodb
+   
+ 
+  account:
+    image: account:v2
+    mem_limit: 700m
+    container_name: account-ms
+    ports:
+      - "8080:8081"
+    networks:
+      - vibolnetwork
+    depends_on: 
+      configserver:
+        condition: service_healthy
+    environment:
+      SPRING_PROFILES_ACTIVE: default
+      SPRING_CONFIG_IMPORT: configserver:http://configserver:8071/
+      SPRING_RABBITMQ_HOST: rabbit
+
+  loan:
+    image: loan:v2
+    mem_limit: 700m
+    ports:
+      - "6000:8090"
+    networks:
+      - vibolnetwork
+    depends_on: 
+      - configserver
+      - mongodb
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+    environment: 
+      SPRING_PROFILES_ACTIVE: default
+      SPRING_CONFIG_IMPORT: optional:configserver:http://localhost:8071/
+      SPRING_RABBITMQ_HOST: rabbit
+      MONGODB_HOST_NAME: mongodb  
+  card:
+    image: card:v2
+    mem_limit: 700m
+    ports:
+      - "5000:8070"
+    networks:
+      - vibolnetwork
+    depends_on: 
+      - configserver
+      - mongodb
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+    environment: 
+      SPRING_PROFILES_ACTIVE: default
+      SPRING_CONFIG_IMPORT: optional:configserver:http://localhost:8071/
+      SPRING_RABBITMQ_HOST: rabbit
+      MONGODB_HOST_NAME: mongodb    
+networks:
+  vibolnetwork:

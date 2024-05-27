@@ -1,0 +1,64 @@
+*** Build Docker File from Jar file *** 
+
+1. mvn clean package :  to create Jar file in the Maven 
+
+// Deploy system 
+2. java -jar target/account-0.0.1-SNAPSHOT.jar
+
+// Create docker Image 
+
+3. Right click on the mainfile then chose file and name it "Dockerfile" 
+
+// in the file Dockerfile need to wirte command 
+
+#Start with base image containing java runtime 
+
+FROM openjdk:10
+
+# Information of owner or maintainer of image 
+
+MAINTAINER namelbank
+
+# Add the application's jar to the container
+
+COPY target/account-0.0.1-SNAPSHOT.jar account-0.0.1-SNAPSHOT.jar
+
+#Execute the applicatoin : target/account-0.0.1-SNAPSHOT.jar (array of string) 
+
+ENTRYPOINT [ "java","-jar","/account-0.0.1-SNAPSHOT.jar" ]
+
+
+-----------------
+
+4. in CLI : cmd we need to create image from docker file we just write command 
+
+>> docker build . -t vibolbank/account (. install in the current direcgory ; -t : tag name of the image file) 
+>> docker image =  check image we have : 
+
+note we can download small docker file by put : 
+
+openjdk: 17-alpine
+
+>> docker images = check all images 
+
+**** Run docker File image *** 
+
+// run image file 
+
+>> docker images 
+
+>> docker run -p 85:5050 vibolbank/account 
+
+85 (output) : 5050 (inside port jar file)
+
+----------------- 
+
+
+
+
+
+
+
+
+
+

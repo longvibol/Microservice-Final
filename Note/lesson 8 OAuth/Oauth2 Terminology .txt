@@ -1,0 +1,140 @@
+Oauth2 Terminology 
+
+ពេលយើងប្រើ Oauth2 យើងអោយសិទ្ធទៅ  Third party access ទៅ resource របស់យើង 
+
+- Resource Owner : our account- It is you the end user. 
+- Client : Website, mobile app or API ដែលមានទំនាក់ទំនងជាមួយ resource owner
+- Authorization Server : គឺជា server ដែលរក្សាទុកនូវ Resource Owner Account, It authorization logic acts as Authorization server. 
+- Resource Server - ជាកន្លែងដែល Resource client (Webite, api..) hosting
+
+Example : Stackoverflow want to login by github. 
+Resource Server is Stackoverflow (hosting client) 
+
+- Scopes: is the granular permissions (read only, email, wirte or something else) 
+
+------------------------------------------------------------
+
+** OpenID Connect is the build on top of oAuth2 framework. 
+
+OAuth 2: provide authorization via an access token containing scopes
+OpenID Connect: provide authentication by introducing a new ID token which contains a new set of information and claims specification for identity
+ 
+
+==> បើយើងមានតែ Oauth 2 យើងបានត្រឹមដឹងតែ scope តែយើងត្រូវការ Informaton ទៀតចឹងបានគេបង្កើត OpenID Connect មកទៀត
+ដើម្បីបង្កើត standard around sharing identity details among the applications. 
+
+
+
+** OpenID and Oauth 2 flow is same អ្វីដែលខុសគ្នាគឺ openid(email, profile) scopes ត្រូវបានប្រើតាំងពីដំបូង ហើយនៅចុងក្រោយពេលផ្លាស់ប្តូរ Clien ទទួលបាន
+Access Token and ID Token. 
+
+
+Why is OpenID Connect importance?
+
+- ពេលយើងយើងថែម openID គឺយើងបន្ថែមពត៌មានទៅអោយ applicaiton របស់យើង ដូនេះ ដើម្បីបំពេញ IAM (Identity & Access Management) 
+យើងប្រើ OAuth2 and OpenID 
+- OpenID Connect add below to OAuth 2.0
+
++ OIDC standardizes the scopes to openid, profile, email, and address.
++ ID Token using JWT(json web token) standard 
++ OIDC exposes the standardized "/userinfo" endpoint to qurey the information. 
+
+Implement of Oauth server is Keyclock!
+
+--------------------
+
+- Grant Type Flow: ប្រភេទនៃការ ចូលក្នុង system (mobile app, user, api ...)
+Ex: BackEnd to BackEnd flow 
+
+Client credentials Grant Type Flow in Oauth2: (backend APIs communication) 
+
+1. Client ចង់ប្រើ Resource ក្នុង Resource srever ចឹងវាប្រាប់ទៅ Auth Server នេះជាសិទ្ធរបស់ខ្ញុំ ខ្ញុំចង់បានទិន្នន័យយកមកប្រើបានអត់
+2. Auth Server ធ្វើការផ្ទៀងផ្ទាត់ត្រឹមត្រូវហើយវាចេញជា Access Token អោយ client វិញ
+3. Client សួរទៅកាន់ Resource server ហើយប្រាប់ថានេះ ជា Access Token របស់ខ្ញុំ ខ្ញុំចង់បាន ទិន្នន័យយកមកប្រើ សូមជួយពិនិត្យមើលផង
+4. Resource Server ពិនិត្យ access tokend ហើយផ្ទាងផ្ទាត់ជាមួយ Auth server ត្រឹមត្រូវហើយ Resource server អោយយកទិន្នន័យទៅប្រើបានហើយ
+
+What it send to from step 1 to 2 (clent to auth server) have :
+- Client_id & Client_secret
+- Scope
+- grant_type 
+
+Grand flow type: 
+
+- UI application 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

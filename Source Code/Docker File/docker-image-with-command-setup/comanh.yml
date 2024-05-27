@@ -1,0 +1,151 @@
+version: "3.8"
+services:
+  configserver:
+    image: vibollong/configserver:v2
+    mem_limit: 700m
+    ports:
+      - "8000:8071"
+    networks:
+      vibolnetwork:
+        aliases:
+          - configserver
+  rabbitmq:
+    image: rabbitmq:3.13-management
+    container_name: rabbitmq
+    environment:
+      - RABBITMQ_DEFAULT_USER=guest
+      - RABBITMQ_DEFAULT_PASS=guest
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    networks:
+      vibolnetwork:
+
+  eurekaserver:
+    image: vibollong/eurekaserver:v2
+    mem_limit: 700m
+    ports:
+      - "9000:9000"
+    networks:
+      vibolnetwork:
+       aliases:
+          - eurekaserver       
+    depends_on: 
+      - configserver
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+    environment: 
+      SPRING_PROFILES_ACTIVE: default
+      SPRING_CONFIG_IMPORT: optional:configserver:http://localhost:8071/
+
+  mongodb:
+    image: mvertes/alpine-mongo:latest
+    ports:
+      - "7777:27017"
+    volumes:
+      - './data:/data/db'
+    networks:
+      vibolnetwork:
+        aliases: 
+          - mongodb
+  gatewayserver:
+    image: vibollong/gatewayserver:v2
+    mem_limit: 700m
+    ports:
+      - "8080:8080"
+    networks:
+      vibolnetwork:
+        aliases:
+          - gatewayserver 
+    depends_on: 
+      - configserver
+      - eurekaserver
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+    environment: 
+      SPRING_PROFILES_ACTIVE: default
+      SPRING_CONFIG_IMPORT: optional:configserver:http://localhost:8071/
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eurekaserver:9000/eureka/
+  
+  account:
+    image: vibollong/account:v2
+    mem_limit: 700m
+    ports:
+      - "7000:8080"
+    networks:
+      vibolnetwork:
+        aliases:
+          - account 
+    depends_on: 
+      - configserver
+      - eurekaserver
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+    environment: 
+      SPRING_PROFILES_ACTIVE: default
+      SPRING_CONFIG_IMPORT: optional:configserver:http://localhost:8071/
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eurekaserver:9000/eureka/
+
+  loan:
+    image: vibollong/loan:v2
+    mem_limit: 700m
+    ports:
+      - "6000:8090"
+    networks:
+      vibolnetwork:
+        aliases:
+          - loan
+    depends_on: 
+      - configserver
+      - eurekaserver
+      - mongodb
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+    environment: 
+      SPRING_PROFILES_ACTIVE: default
+      SPRING_CONFIG_IMPORT: optional:configserver:http://localhost:8071/
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eurekaserver:9000/eureka/
+      MONGODB_HOST_NAME: mongodb
+
+  card:
+    image: vibollong/card:v2
+    mem_limit: 700m
+    ports:
+      - "5000:8070"
+    networks:
+      vibolnetwork:
+        aliases:
+          - card
+    depends_on: 
+      - configserver
+      - eurekaserver
+      - mongodb
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+    environment: 
+      SPRING_PROFILES_ACTIVE: default
+      SPRING_CONFIG_IMPORT: optional:configserver:http://localhost:8071/
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eurekaserver:9000/eureka/
+      MONGODB_HOST_NAME: mongodb    
+networks:
+  vibolnetwork:

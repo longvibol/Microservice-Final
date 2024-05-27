@@ -1,0 +1,82 @@
+**** Push Docker Fild to Dockerhub  ****
+
+download rabbit mq
+
+docker run -it --rm --name rabbitmq -p 5672:5672 -p 15672:15672 rabbitmq:3.13-management
+
+
+1. Log in 
+
+docker login -u "vibollongW" -p "Mondy@1689"
+
+2. goto website dockerbub : https://hub.docker.com/
+
+Create Repository -> put the name we want to create 
+- docker push vibollong/loan:tagname
+
+3. Check the file in the docker destop 
+
+>> docker push vibollong/loan:tagname
+
+Ex: >> docker push vibollong/loan:v2
+
+4. Maven build images 
+
+>> mvn compile jib:dockerBuild 
+
+---------------------- Plugin 
+
+<plugins>
+			<plugin>
+				<groupId>com.google.cloud.tools</groupId>
+				<artifactId>jib-maven-plugin</artifactId>
+				<version>3.3.2</version>
+				<configuration>
+					<to>
+						<image>vibollong/${project.artifactId}:v2</image>
+					</to>
+				</configuration>
+			</plugin>
+
+---------------------- 
+
+**** 5 push server from custome name to docker hub:
+
+1. change the name of the images 
+>> docker images :
+
+mvertes/alpine-mongo     latest            ef364a8cf19c   5 years ago    123MB
+
+2. change the image name by:
+
+>> docker image tag b188af0de93c vibollong/mongo:v2
+
+>> docker images 
+
+C:\Users\GE66>docker images
+
+REPOSITORY               TAG               IMAGE ID       CREATED        SIZE
+vibollong/rabbitmq       v2                b188af0de93c   2 months ago   251MB
+rabbitmq                 3.13-management   b188af0de93c   2 months ago   251MB
+vibollong/mongo          v2                b188af0de93c   2 months ago   251MB
+mvertes/alpine-mongo     latest            ef364a8cf19c   5 years ago    123MB
+vibollong/account        v2                d3f42008c4c2   54 years ago   339MB
+vibollong/card           v2                fb3042d0ad41   54 years ago   317MB
+vibollong/configserver   v2                0df36b451a67   54 years ago   315MB
+vibollong/loan           v2                04487bf700ea   54 years ago   315MB
+
+>> docker push vibollong/mongo:v2
+
+
+
+
+
+
+
+
+
+
+
+
+
+

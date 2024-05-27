@@ -1,0 +1,109 @@
+*** Scale instance from docker *** 
+
+1. docker ps (check container running)
+2. docker run -d -p 86:5050 vibolbank/account
+-d = distach mode (no log in the cli) 
+-p = port runing 86 is the outside port 
+
+================= Command Docker 
+
+1. docker logs Container id (check log in the docker image)
+>> docker logs ffff
+
+2. docker logs -f Container id (-f = follow log) 
+
+3. docker stop ContainerID = stop service 
+
+4. docker ps -a (show all container)
+
+** start the service in the container ** 
+
+>> docker ps -a (check all container we have create image )
+>> docker start ContainerID 
+
+Or start multiple container 
+
+>> docker start CID1 CID2
+
+5. pause container (stop server for temperary) 
+
+>> docker pause CID
+>> docker unpause CID 
+
+6. check inspect in the container 
+
+>> docker container inspect CID
+
+{        "Id": "7cf4c75d6465982a37d6182cd733345621f8906bd7371dfde4688df3032221f9",
+        "Created": "2024-03-21T01:16:49.655317509Z",
+        "Path": "java",
+        "Args": [
+            "-jar",
+            "/account-0.0.1-SNAPSHOT.jar"
+        ],
+        "State": {
+            "Status": "running",
+            "Running": true,
+            "Paused": false,
+            "Restarting": false,
+            "OOMKilled": false,
+            "Dead": false,
+            "Pid": 3031,
+            "ExitCode": 0,
+            "Error": "",
+            "StartedAt": "2024-03-21T01:32:47.882695975Z",
+            "FinishedAt": "2024-03-21T01:28:29.878348
+
+
+7. kill container vs stop container 
+>> docker kill CID 
+
+- kill the service will terminate imedily 
+- stop : keep time to the system stop the serivce one by one
+
+
+8. check docker status how much CPU ruuning memory ect 
+
+>> docker stats 
+
+9. Remove container 
+
+>> docker rm CID 
+docker rm c7944499d7d5
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

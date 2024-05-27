@@ -1,0 +1,218 @@
+* Crate serperate server for Config Server * 
+
+1. Create configserver 
+- @EnableConfigServer (Put in main class: ConfigserverApplication)
+
+@EnableConfigServer
+@SpringBootApplication
+public class ConfigserverApplication {
+
+	public static void main(String[] args) {
+		SpringApplication.run(ConfigserverApplication.class, args);
+	}
+
+}
+
+- in pom.xml
+
+<properties>
+		<java.version>17</java.version>
+		<spring-cloud.version>2023.0.1</spring-cloud.version>
+</properties>
+
+-------------------------------------------------------
+
+<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-config-server</artifactId>
+</dependency>
+
+-------------------------------------------------------
+
+<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>org.springframework.cloud</groupId>
+				<artifactId>spring-cloud-dependencies</artifactId>
+				<version>${spring-cloud.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+		</dependencies>
+</dependencyManagement>
+
+- In applicaton.properties
+
+
+#applicaiotn name put the same servier we provide = configserver
+spring.application.name=configserver
+
+#acces to storage configuration can store in: class path, git, and fild system
+#spring.profiles.active=native
+
+#spring.cloud.config.server.native.search-locations=classpath:/config-account
+#spring.cloud.config.server.native.search-locations=classpath:/config-card
+#spring.cloud.config.server.native.search-locations=classpath:/config-loan
+
+spring.cloud.config.server.git.uri=https://github.com/longvibol/bank-config-server
+spring.cloud.config.server.git.clone-on-start=true
+spring.cloud.config.server.git.default-label=main
+
+
+#spring.cloud.config.server.native.search-locations=file:///C://bankdata//config
+
+
+#servier it is access by port so for account we put 8071, lone 8072, account 8073 example 
+server.port=8071
+#server.port=8072
+#server.port=8073
+
+
+=============================== In src/main/resources: 
+- config-account
+- config-card
+- config-loan
+
+=============================== 
+
+2. Connect from our business logic with configServer
+
+- Crate Controller to get the configeration 
+
+@RequestMapping("api/config")
+@RestController
+public class ConfigController {
+	
+	@Autowired
+	private AccountServiceConfig serviceConfig;
+	
+	@GetMapping("/accounts/properties")
+	public String getProperties() throws JsonProcessingException{
+		ObjectWriter objectWriter = new ObjectMapper().writer().withDefaultPrettyPrinter();
+		Properties properties = new Properties(
+				serviceConfig.getMsg(), 
+				serviceConfig.getBuildVersion(), 
+				serviceConfig.getMailDetails(),
+				serviceConfig.getActiveBranches());
+		String json = objectWriter.writeValueAsString(properties);
+		return json;
+				
+	}
+
+}
+
+
+- Create ServerConfig class : Mapping from configser 
+
+@Data
+@Configuration
+@ConfigurationProperties(prefix = "account")
+public class AccountServiceConfig {
+	private String msg;
+	private String buildVersion;
+	private Map<String, String> mailDetails;
+	private List<String> activeBranches;
+}
+
+- Create properties classs : then we use inside the service 
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class Properties {
+
+	private String msg;
+	private String buildVersion;
+	private Map<String, String> mailDetails;
+	private List<String> activeBranches;
+}
+
+
+- application.propertie : to connect from configserver 
+
+spring.application.name=account
+spring.profiles.active=prod
+spring.config.import=optional:configserver:http://localhost:8071
+
+#optional: if we don't put it mean the configserver need to start first so the account can not run 
+
+== Testing API: localhost:5050/api/config/accounts/properties
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

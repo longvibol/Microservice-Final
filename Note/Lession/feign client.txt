@@ -1,0 +1,193 @@
+
+feign client:កន្លែងដែលយើងត្រូវបង្កើតអោយវាមានទំនាក់ទំនងជាមួយ service ដទៃទៀត
+ដូចជា Account serive ចង់បានពត៌មានពី loan and card 
+
+Ex: endpoint :customerDetail (we want ot get the full information from customer) 
+
+customer: 1 have ==> 
+
++ customer name: 
++ account type:
++ loans : [5000, 30000]
++ cards : [debit001, credit002,saveing] 
+
+ដូចនេះយើងត្រូវបង្កើត feign client in Account service ព្រោះយើងទាញទិន្នន័យពី loan and card:
+And card and loan we need to create new class in Account for Feign Client 
+
+==========================
+
+Step to create feign client: 
+
+1. Add dependency :
+
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-openfeign</artifactId>
+		</dependency>
+
+------------ what Other Side provide the endpoint from the API:
+
+GET: localhost:8070/api/cards/1
+
+- localhost:8070 = service
+- /api/cards/1 = PATH
+
+
+{
+        "cardId": number,
+        "customerId": number,
+        "cardNumber": string,
+        "cardType": "credit lose",
+        "totalLimit": 6000,
+        "amountUsed": 200,
+        "availableAmount": 4900,
+        "createDate": "2024-04-24"
+    },
+
+It mean it is the List<card> ==> we will crate our card by ourselve 
+
+2. Create interface: where the call get respond: @GetMapping("/api/cards/{customerId}")
+
+- CardFeignClient in service.client ==> then create CardDto(class) 
+
+@FeignClient(name="card")
+
+// name="card" need to be the same eurekaserver
+
+public interface CardFeignClient {
+
+//	create card : GET: localhost:8070/api/cards/1 = we need to create the same responde we get 
+
+	@GetMapping("/api/cards/{customerId}")
+	List<CardResponseDTO> getCardInfo(@PathVariable Long customerId);
+
+	// we create it base on card controller find by customerID	
+	// It will auto connect to card service 
+	
+}
+
+- LoanFeignClient: @GetMapping("/api/loans/{customerId}") :
+
+@FeignClient(name = "loan")
+public interface LoanFeignClient {
+
+//	create card : GET: localhost:8070/api/loans/1 = we need to create the same responde we get 
+	@GetMapping("/api/loans/{customerId}")
+	List<LoanResponseDTO> getLoanInfo(@PathVariable Long customerId);
+	// we create it base on loan controller find by customerID
+
+}
+
+
+3. Create API response call from account 
+
+3.1: CustomerController 
+
+@GetMapping("customerdetail/{myCustomerId}")
+	public ResponseEntity<CustomerDetailDTO> getCustomerDetail(@PathVariable("myCustomerId") Long customerId){
+		
+		CustomerDetailDTO dto = new CustomerDetailDTO();
+		Customer customer = customerService.getById(customerId);	
+		
+		if(customer == null) {
+			throw new RuntimeException("No customer found with this id");
+		}
+		
+//		we want to convert from customer to customerDTO 	
+		
+		CustomerDTO customerDTO = customerMapper.toCustomerDTO(customer);
+		
+		List<LoanResponseDTO> loanInfo = loanFeignClient.getLoanInfo(customerId);
+		List<CardResponseDTO> cardInfo = cardFeignClient.getCardInfo(customerId);
+		
+		
+		dto.setCustomer(customerDTO);
+		dto.setLoans(loanInfo);
+		dto.setCards(cardInfo);	
+	
+		
+		return ResponseEntity.ok(dto);
+		
+	}
+
+3.2: CustomerDetailDTO : what we want to assing to the output 
+
+
+@Data
+public class CustomerDetailDTO {
+
+//	ពត៌មានដែលយើងនឹង return មក	
+	private CustomerDTO customer;
+	private List<CardResponseDTO> cards;
+	private List<LoanResponseDTO> loans;
+	
+}
+
+
+@Data
+public class CustomerDetailDTO {
+
+//	ពត៌មានដែលយើងនឹង return មក	
+	private CustomerDTO customer;
+	private List<CardResponseDTO> cards;
+	private List<LoanResponseDTO> loans;
+	
+}
+
+
+
+4. convert DT)
+
+5. Anotation @EnableFeignClients for spring create bean
+
+
+*** Fix Error 
+
+- must anable : @EnableFeignClients
+- Ambiguous(ស្ទួន) mapping : in customerController have double bean we need to identity deference :
+ត្រូវដាក់ PATH អោយខុសគ្នា
+
+==> @GetMapping("customerdetail/{customerId}") ដាក់អោយខុសគ្នាជាមួយអាស្ទួននឹងទៅ
+
+
+សរុបៈ
+
+ពេលយើងហៅវា យើងហៅតាម feign client ដោយ feign client វាជាអ្នកទៅហៅតាម servie : name វាមួយៗ 
+ដូចនេះទោះបីជានៅក្នង Eureka servere have manh instance it is not depen on the IP. it is depen on the service name 
+
+- Feign client វានឹងធ្វើ load banacing អោយយើងតែម្តង
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

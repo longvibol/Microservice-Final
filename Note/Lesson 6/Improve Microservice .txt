@@ -1,0 +1,354 @@
+Improve Microservice: 
+
+1. Refresh config level 2 (use refreshbus in actuator) 
+2. Refresh config level 3 ( RabbitMQ,Webhook, hookdeck) 
+
+Note term keyworks:
+
+- Check heathy in side the docker compose Liveness (Up or not) 
+- Check readiness (Can it get the request or not) 
+
+- Refresh Config server: 
+
+បើយើងធ្វើការផ្លាស់ប្តូរ config server វាទាមទារអោយយើងធ្វើការ Restart Service ដែលភ្ជាប់ទៅ Configer srever all 
+==> Mostly we put the config file in Github. 
+
+Video link day-21:
+
+https://www.youtube.com/watch?v=Q12c0ajIXAc&list=PLgTdwF3gS2V0CkkQWoeVB5yea9w9NU1xD&index=27&ab_channel=Piseth
+
+--------------- Git hub vibollong
+
+https://github.com/longvibol/bank-config-server.git
+
+- Why we need Property: We want to call inside each funtion (Property កន្លែងដែលយើងអាចប្រាប់ what is the information for the service
+- ឧទាករណ៍នៅក្នុង Card service គេចង់បានឈ្មោះនៃ Branch នឹង ឈ្មោះនៃសាខាណាមួយ
+
+===== Step to create API call proptery:
+Example in Card:
+
+1. ate class : ConfigController in the controller 
+
+@RestController
+@RequestMapping("api/config")
+public class ConfigController {
+	@Autowired
+	private CardServiceConfig serviceConfig;
+
+	@GetMapping("/properties")
+	public String getProperties() throws JsonProcessingException {
+		ObjectWriter objectWriter = new ObjectMapper().writer().withDefaultPrettyPrinter();
+		Properties properties = new Properties(
+				serviceConfig.getMsg(), 
+				serviceConfig.getBuildVersion(),									
+				serviceConfig.getMailDetails(), 
+				serviceConfig.getActiveBranches());
+		String json = objectWriter.writeValueAsString(properties);
+		return json;
+	}
+
+}
+
+
+2. eate "CardServiceConfig" class package :config
+
+@Configuration
+@ConfigurationProperties(prefix = "card")
+@Data
+public class CardServiceConfig {
+	private String msg;
+	private String buildVersion;
+	private Map<String, String> mailDetails;
+	private List<String> activeBranches;
+	
+	
+	// homework: set database properties
+}
+
+3. crate Properties class: in package property
+
+@Data
+public class Properties {
+	private String msg;
+	private String buildVersion;
+	private Map<String, String> mailDetails;
+	private List<String> activeBranches;
+	public String getMsg() {
+		return msg;
+	}
+
+-------------- 
+
+4. Put dependancy 
+
+<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-config</artifactId>
+</dependency>
+
+
+5. Connect to configserver: application.property 
+
+spring.profiles.active=dev
+spring.config.import=optional:configserver:http://localhost:8071
+
+--- in the config server we link to github :
+https://github.com/longvibol/bank-config-server/blob/main/card-dev.properties
+
+
+6. Stat Configserver first: testing call from Configer server to propery from get up  
+
+- localhost:8071/card/properties
+
+Result: 
+
+ "name": "card",
+    "profiles": [
+        "properties"
+    ],
+    "label": null,
+    "version": "1984fa933b0cbaeaaea476b453201610a8996765",
+    "state": null,
+    "propertySources": [
+
+
+7. Testing API call from Card service to configserver : 
+
+localhost:8070/api/config/properties
+
+Restult: 
+
+"msg" : "Welcome to the Vibollong Bank card devuction application 4000",
+  "buildVersion" : "10000",
+  "mailDetails" : {
+    "hostName" : "dev-card@vibol.com",
+    "port" : "9002hello",
+    "from" : "dev-card@piseth.com",
+    "subject" : "Your card Details from Vibol Bank dev Environment"
+  },
+  "activeBranches" : [ "Kandal", "Banteay Mean Chey", "Svay Reang" ]
+}
+
+
+--------------------------------  In case we want to update by triger from the 
+
+
+** Level 2 Triger update from actuator 
+
+- In applicatoin.property add acutatro :
+
+management.info.env.enabled = true
+management.endpoint.shutdown.enabled=true
+management.endpoints.web.exposure.include=*
+
+- We put the dependancy in site every server : 
+
+<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-actuator</artifactId>
+</dependency>
+
+- Use API to triger the refress: 
+
+API: POST
+
+http://localhost:8081/actuator/busrefresh
+
+So we no need to restart the card service **
+
+------------------ 
+
+
+**** Level 3 ********** Auto Triger from when the Configserver
+
+We think on logi where we want to triger auto : it is only the ConfigerServer 
+
+1. Add Rabbit MQ to monitor server
+
+In application.property: 
+
+#rabitmq setup
+spring.rabbitmq.host=localhost
+spring.rabbitmq.port=5672
+spring.rabbitmq.username=guest
+spring.rabbitmq.password=guest
+
+
+-------------- Actuator 
+
+#actuator
+management.info.env.enabled = true
+management.endpoint.shutdown.enabled=true
+management.endpoints.web.exposure.include=*
+
+
+------------- Dependany
+
+<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-bus-amqp</artifactId>
+		</dependency>
+
+-- spring-cloud-starter-bus-amqp សម្រាប់ Triger to other service 
+
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-config-monitor</artifactId>
+		</dependency>
+		
+-- spring-cloud-config-monitor សម្រាប់ check what is change 
+
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-actuator</artifactId>
+		</dependency>
+
+
+-- spring-boot-starter-actuator : service check 
+
+
+------------- 
+
+1. Rabbit MQ to Monitor : it is Ashcrynous 
+
+docker run -it --rm --name rabbitmq -p 5672:5672 -p 15672:15672 rabbitmq:3.13-management
+
+--- Dependacny 
+
+<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-bus-amqp</artifactId>
+		</dependency>
+
+
+---- property : 
+
+#rabitmq setup
+spring.rabbitmq.host=localhost
+spring.rabbitmq.port=5672
+spring.rabbitmq.username=guest
+spring.rabbitmq.password=guest
+
+
+We run from docker : wokring port 5672 
+
+**** 2. https://github.com/longvibol/bank-config-server : github we setup Webhook 
+
+Settings --> Webhooks -->  Add webhook --> to monitor the server update to the service
+
+-- But we don't have connection from local to public we need another thirth help : we use Hookdeck 
+
+websit: https://console.hookdeck.com/
+
+Add Destination --> follow the step to setup the connection from local to public url :
+
+1. Install the Hookdeck CLI on your device
+
+scoop bucket add hookdeck https://github.com/hookdeck/scoop-hookdeck-cli.git 
+
+2. in stall : scoop inside powershell
+
+https://www.makeuseof.com/windows-install-scoop/
+
+>> iwr -useb get.scoop.sh | iex
+
+3. install hookdeck inside window:
+
+>> scoop install hookdeck
+
+
+4. login to hookdesk  
+
+>> hookdeck login --cli-key 4on90nhgnz2sj5b387a0e3bj35fj1bamctdcvydlgfl285tu5e
+
+5. Setup port from local to public port 
+
+>> hookdeck listen [port] Source
+
+it will ask the question: What path should the events be forwarded to 
+==> we put " /monitor
+becaute in the actuator :localhost:8071/acutator/monitor 
+
+Then : What's your connection label
+
+==> localhost
+
+Then it will crate URL : https://hkdk.events/tiuvvewg5v3ceb
+
+
+Ex: hookdeck listen 8071 Source
+port: 8071 is the card srevice port 
+
+-- Logout from hookdeck:
+
+>> hookdeck logout
+then we can login again so we can use the source again:
+
+hookdeck listen [port] Source
+
+6. In the gitbut we put the monitor from the url in hookdeck: 
+
+- Payload URL : we put 
+
+https://hkdk.events/tiuvvewg5v3ceb
+
+- Content type : application/json
+
+Save . 
+
+# latest RabbitMQ 3.13
+docker run -it --rm --name rabbitmq -p 5672:5672 -p 15672:15672 rabbitmq:3.13-management
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

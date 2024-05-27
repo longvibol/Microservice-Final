@@ -1,0 +1,181 @@
+version: "3.8"
+services:
+  configserver:
+    image: configserver:latest
+    mem_limit: 700m
+    ports:
+      - "8000:8071"
+    networks:
+      pisethnetwork:
+        aliases:
+          - configserver
+        
+  eurekaserver:
+    image: eurekaserver:latest
+    mem_limit: 700m
+    ports:
+      - "9000:9000"
+    networks:
+      pisethnetwork:
+       aliases:
+          - eurekaserver
+       
+    depends_on: 
+      - configserver
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+    environment: 
+      SPRING_PROFILES_ACTIVE: default
+      SPRING_CONFIG_IMPORT: optional:configserver:http://localhost:8071/
+
+  postgres:
+    image: postgres:latest
+    environment:
+      - POSTGRES_USER=account
+      - POSTGRES_PASSWORD=account123
+      - POSTGRES_DB=account_service
+    ports:
+      - "5432:5432"
+    networks:
+      pisethnetwork:
+        aliases:
+          - postgres
+    depends_on: 
+      - configserver
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s  
+
+  pg-admin:
+    image: dpage/pgadmin4:latest
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=admin@email.com
+      - PGADMIN_DEFAULT_PASSWORD=admin
+      - PGADMIN_LISTEN_PORT=5151
+    ports:
+      - "5151:5151"
+    networks:
+      pisethnetwork:   
+         aliases:
+          - pgadmin  
+  
+  mongodb:
+    image: mvertes/alpine-mongo:latest
+    ports:
+      - "7777:27017"
+    volumes:
+      - './data:/data/db'
+    networks:
+      pisethnetwork:
+        aliases: 
+          - mongodb
+  
+  account:
+    image: account:latest
+    mem_limit: 700m
+    ports:
+      - "7000:8080"
+    networks:
+      pisethnetwork:
+        aliases:
+          - account 
+    depends_on: 
+      - configserver
+      - eurekaserver
+      - postgres
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+    environment: 
+      SPRING_PROFILES_ACTIVE: default
+      SPRING_CONFIG_IMPORT: optional:configserver:http://localhost:8071/
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eurekaserver:9000/eureka/
+      POSTGRES_HOST_NAME: postgres
+
+  loan:
+    image: loan:latest
+    mem_limit: 700m
+    ports:
+      - "6000:8090"
+    networks:
+      pisethnetwork:
+        aliases:
+          - loan
+
+    depends_on: 
+      - configserver
+      - eurekaserver
+      - mongodb
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+    environment: 
+      SPRING_PROFILES_ACTIVE: default
+      SPRING_CONFIG_IMPORT: optional:configserver:http://localhost:8071/
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eurekaserver:9000/eureka/
+      MONGODB_HOST_NAME: mongodb
+
+  loan1:
+    image: loan:latest
+    mem_limit: 700m
+    ports:
+      - "6001:8090"
+    networks:
+      pisethnetwork:
+        aliases:
+          - loan
+    depends_on: 
+      - configserver
+      - eurekaserver
+      - mongodb
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+    environment: 
+      SPRING_PROFILES_ACTIVE: default
+      SPRING_CONFIG_IMPORT: optional:configserver:http://localhost:8071/
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eurekaserver:9000/eureka/
+      MONGODB_HOST_NAME: mongodb
+
+  card:
+    image: card:latest
+    mem_limit: 700m
+    ports:
+      - "5000:8070"
+    networks:
+      pisethnetwork:
+        aliases:
+          - card
+    depends_on: 
+      - configserver
+      - eurekaserver
+      - mongodb
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+    environment: 
+      SPRING_PROFILES_ACTIVE: default
+      SPRING_CONFIG_IMPORT: optional:configserver:http://localhost:8071/
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eurekaserver:9000/eureka/
+      MONGODB_HOST_NAME: mongodb    
+networks:
+  pisethnetwork:

@@ -1,0 +1,125 @@
+** docker compose **
+
+ 1.check version:  
+
+>> docker compose version : 
+Docker Compose version v2.24.6-desktop.1
+
+2. check docker engine
+
+>> docker version 
+Engine:
+  Version:          25.0.3
+
+--------------- step to follow  
+
+1. We want to run postgres, pgadmin and account_service 
+-  crate docker account_service by jar file 
+* everyting inside docker image need to be the default port inside docker
+
+
+2. Create Docker file : docker-compose.yml 
+
+version: "3.8"
+
+services:
+  postgres:
+    image: postgres:14
+    environment:
+      - POSTGRES_USER=account
+      - POSTGRES_PASSWORD=account123
+      - POSTGRES_DB=account_service
+    ports:
+      - "5432:5432"
+    volumes:
+      - data:/var/lib/postgresql/data
+
+  pg-admin:
+    image: dpage/pgadmin4:6
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=admin@email.com
+      - PGADMIN_DEFAULT_PASSWORD=admin
+      - PGADMIN_LISTEN_PORT=5151
+
+    ports:
+      - "5050:5050"
+  
+  account_service:
+    image: account_service
+    ports:
+      - "8080:8080"
+
+volumes:
+  data:
+
+3. run compose: 
+
+>> docker compose up 
+>> docker compose down 
+
+-------- upload to docker hub *** 
+
+>> docker images 
+>> docker tag account_service vibollong/account_service:v1.0
+
+>> docker login -u "vibollongW" -p "Mondy@168"
+>> docker push docker.io/vibollong/account_service
+
+
+------------- យក Images mok use from docker hub 
+
+>>docker images:  check local images 
+>>docker pull vibollong/account_service (check in the online docker hub repository) 
+to use the new images 
+
+>> docker run vibollong/account_service
+
+------------------- Error
+
+401 Unauthorized when using jib to create docker image --Fix 
+
+delete the :
+
+Just delete the credsStore property from the docker-config file. You will find the config.json at your user-home dir.
+
+the path is: $USER/.docker/config.json and suppose the file contains the followings,
+
+{
+  "auths": {
+    "https://index.docker.io/v1/": {}
+  },
+  "credsStore": "desktop"
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

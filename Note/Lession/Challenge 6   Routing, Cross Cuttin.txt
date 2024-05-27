@@ -1,0 +1,216 @@
+Challenge 6  : Routing, Cross Cutting Concern 
+
+- Signle entry point problem 
+- gateKeeper need to check 
+- Cross Cutting Concern:  logging, auditing, tracing, security 
+- Url have Static and dynamic (យើងអាច Rout ទៅយកversion ជាក់លាក់ណាមួយបាន)
+
+*** Use Edge Server or API Gateway *** 
+
+Why we need API Gateway?
+1. Maintain signle Entrypoint : ទៅរកតែម្នាក់នឹង
+2. Cross Cutting Concern : 
+save time: no need to have duplicate code, inconsistence behavior
+- we should be the comman libary to apply standat 
+
+* Regression Test ធ្វើតេស្តឡើងវិញ
+* Regression Bug: first work --> add new feature --> Not working 
+
+3. Route based on custom requirment: Dynmic routing 
+
+* cascading failures : fail after one service is fail.
+* cascading delete: if we delete strong entity after the below entiy also delet) 
+* downstream services : សើវេស ហៅតគ្នា
+
+==> Authentication and authorization mechanisms can be implemented at the edage server 
+==> Full control 
+
+
+--------------------------------------------
+
+API Gateways is the server ==> How to implement it: we use Spring Cloud Gateway
+
+- Stream line by emphasizing ease and efficiency. 
+- It use reactive framework (reactive = non blocking) ល្បឿនលឿន
+- Reactive don't block thread (request) 
+- វានៅចន្លោះ រវាង អ្នក Request និង Resource 
+- Inbound traffice Request ចូលមកនិងឆ្លើងកាត់ API Gateway នឹង
+- API gateway ជា concerp and spring cloud gateway ជា Implementation 
+spring cloud gateway the same as Spring developer. 
+
+==> Spring cloud gateway is the middle of the request and resource : we can intercepts, analyzes, modifies every request. 
+
+
+1. Client -> Gateway handler -> Predicate -> Pre Filter -> Post Filter->Resource-> Post Filter> Gateway handlter -> Client 
+
+** Pre Filter : validation->include & exclude list-> authen&autoh->Rate limit->Day.....
+** Post Filter : log time process and user log 
+
+
+====================== Step To create gateway server =================
+
+1. Spring Inizial 
+
+Add: 
+
+- actuator
+- devtools
+- eureka-client
+- starter-config
+
+2. Configure application.properties: Connect from gateway server to eureka serve 
+
+spring.application.name=gatewayserver
+
+spring.config.import=optional:configserver:http://localhost:8071/
+
+management.endpoints.web.exposure.include=*
+
+## Configuring info endpoint
+info.app.name=Gateway Server Microservice
+info.app.description=Piseth Bank Gateway Server Application
+info.app.version=1.0.0
+management.info.env.enabled = true
+management.endpoint.gateway.enabled=true
+spring.cloud.gateway.discovery.locator.enabled=true
+#spring.cloud.gateway.discovery.locator.lowerCaseServiceId=true
+
+
+3. Add configure server with Gateway server 
+- create file : gatewayserver.properties
+
+server.port=8072
+
+eureka.instance.preferIpAddress=true
+eureka.client.registerWithEureka=true
+eureka.client.fetchRegistry=true
+eureka.client.serviceUrl.defaultZone=http://localhost:9000/eureka/
+
+
+4. Testing : http://localhost:8072/actuator/gateway/routes
+
+"predicate": "Paths: [/ACCOUNT/**], match trailing slash: true",
+"metadata": {
+"management.port": "8080"
+},
+"route_id": "ReactiveCompositeDiscoveryClient_ACCOUNT",
+"filters": [
+"[[RewritePath /ACCOUNT/?(?<remaining>.*) = '/${remaining}'], order = 1]"
+],
+"uri": "lb://ACCOUNT",
+"order": 0
+},
+{
+"predicate": "Paths: [/LOAN/**], match trailing slash: true",
+"metadata": {
+"management.port": "8090"
+},
+"route_id": "ReactiveCompositeDiscoveryClient_LOAN",
+"filters": [
+"[[RewritePath /LOAN/?(?<remaining>.*) = '/${remaining}'], order = 1]"
+],
+"uri": "lb://LOAN",
+"order": 0
+},
+
+5. teshting with Postgraes
+
+localhost:8072/ACCOUNT/api/accounts
+
+We can customize latter on ! 
+
+
+==================== 
+
+lb = Load Balancer 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,133 @@
+start springboot project:
+mvn spring-boot:run
+java -jar target/ourJavFile
+----------------------- Dockerfile to build account microservice ----------
+
+#Start with a base image containing java runtime
+FROM openjdk:17-alpine as build
+
+#Information around who maintains the image
+
+MAINTAINER pisethjavaschool.com
+
+#Add the application's jar to the container
+COPY target/accounts-0.0.1-SNAPSHOT.jar accounts-0.0.1-SNAPSHOT.jar
+
+#Execute the application
+ENTRYPOINT ["java", "-jar", "/accounts-0.0.1-SNAPSHOT.jar"] 
+
+--------------------------------------
+
+view all images: docker images
+build docker and give image name: docker build . -t piseth/account
+(. current folder, -t to give the tag)
+rename image: docker image tag imageId myname/server:latest
+
+inspect image: docker image inspect imageId (docker image inspect 786)
+--------------------- start and deploy account service ------------
+one container instant: docker run -p 8080:8080 piseth/accounts
+one container instant: docker run -p 8081:8080 piseth/accounts
+show container running: docker ps
+----------- some important docker command -----------
+show logs: docker logs containerId
+show continues logs: docker logs -f containerId (f = follow)
+stop container: docker stop containerId
+show show containers: docker ps -a
+start container: docker start containerId1 containerId2
+pause container: docker container pause containerId
+unpause container: docker container unpause containerId
+inspect container: docker container inspect containerId
+kill container: docker kill containerId (without giving time to prepare)
+show container stats: docker stats (CUP usage, process Id,..)
+delete container: docker rm containerId
+run container in detatch mode (Without seeing the log): one container instant: docker run -d -p 8080:8080 piseth/accounts
+
+---------- buildpack -------------
+generate docker image without the need of creating docker file
+
+pom.xml:
+<build>
+		<plugins>
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+				<configuration>
+					<image>
+						<name>pisethjavaschool/${project.artifactId}</name>
+					</image>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+
+mvn spring-boot:build-image (internally use buildpack to generate docker image)
+--------- push image to docker hub ----------
+docker push docker.io/username/server
+ex: docker push docker.io/ingpiseth/accounts
+
+------------------ docker compose ------------------
+make multiple container up ad running
+tool developed to define and share multiple container application.
+check version: docker-compose version
+
+compose file format : 3.8 (map in documents correspond with docker server)
+
+docker-compose.yml file
+version: "3.8"
+
+services:
+
+  accounts:
+    image: pisethjavaschool/accounts:latest
+    mem_limit: 700m
+    ports:
+      - "8080:8080"
+    networks:
+      - piseth-network
+      
+  loans:
+    image: pisethjavaschool/loans:latest
+    mem_limit: 700m
+    ports:
+      - "8090:8090"
+    networks:
+      - piseth-network
+      
+networks:
+  piseth-network:
+------------------
+
+start container in docker-compose: docker-compose up
+stop : docker-compose stop
+Log Explorer extension docker desktop to check log 
+
+
+- docker image prune -a = remove remove container that not related to images running 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

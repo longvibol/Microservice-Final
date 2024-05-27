@@ -1,0 +1,111 @@
+Listion Microservice
+
+- image : have libarary, application code that can make the code running 
+- one image can crate many container 
+- from image to docker client we use Docker CLI 
+when we push to docker hub (it call Docker Registry) 
+
+
+* Cloud Native Application 
+- propose we want to deploy everythere and can work in every enviroment, have small service to working on specifice purpose 
+How can we make Cloud Native App
+
+1. Microservice : create small service 
+2. Containers : package 
+3. DevOps : running process
+4. Continouse deliver: easy to add new feature 
+
+best pratice to buil Cloud Native App : 12 factore: https://12factor.net/
+
+1. Codebase: one modul have one code base to working for the server: account server, loan service ...
+2. Dependencies : same version crate (pow.xml - verion lombok...) local repository for java name .m2
+3. Config : store configuration outside the software code 
+
+Ex: spring.datasource.url= jdbc:postgresql://postgres:5432/account_service
+this is production URL so we much serperate from the production, then we can inject later on. 
+
+4. Backing service: can swap from local connection to another connect without change the code 
+
+5. Build, Release Run : Complily serperate each order
+Build Stage + Configuration =  Release stages
+
+6. Processes : want stateless process: 
+- statless we don't stort in DB, share-nothing  
+
+JWT: store in stateless for user authentication 
+
+ពីមុន Data ជាច្រើនត្រូវបាន Store នៅក្នុង Session 
+- statefull : store 
+
+
+7. Port Binding: self-contained mean run without depenon another 
+
+8. Concurrency: process ជាច្រើនក្នុងពេលតែមួយ ដូចជា អ្នកប្រើប្រាស់ជាច្រើន Access to server 
+- scale up or scale down 
+- servie busy or some server are free 
+
+Ex: Scale up: increse size of RAM, CPU (every add up with new hardware): virturl machine 
+Ex: scale out or horizontal : Add more instance (add service 1 cpu/ 1 GB Ram) in one docker engine : vertual os
+
+9. Diposability ពេលណាប្រើចាំប្រើ បើអត់ចាំបាត់កុំប្រើ
+start up and and shutdown (docker ochestra) 
+
+10. Dev/ Prod parity(ស្មើរភាពគ្នា) : ដាក់លក្ខណកុំអោយខុសគ្នាពេល Enviroment similar use docker 
+
+11. Logs : many service need to create log and we want to see the log file :create sentrolive log
+-wirte logs it call logstash -> Elastic Search -> Kibana 
+
+12. Admin Process: Task can include data cleanup : serperate from produciton environment 
+- Migration process ( need automatic automachine) 
+
+run data insert table data, it is take time to create manule one by one. 
+We need automatice to control   
+
+Microser challenge: 
+
+1 Change size 
+2 Portation Run account inviroment 
+3. Scalabilty docker and container technolgy, 
+
+Configuration need to managerment  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+

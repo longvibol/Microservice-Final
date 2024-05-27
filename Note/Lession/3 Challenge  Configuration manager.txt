@@ -1,0 +1,136 @@
+* 3 Challenge : Configuration managerment
+
+- Seperate the configuration and store it in Gid hub, file system, in database 
+- We use Spring Cloud Config 
+- spring initializer : add Config Server  
+
+* Array list: []
+* Map : need key and value 
+
+==== step to create config service ====
+
+1. Spring initializer : add Config Server
+
+2. Create property in class path: Account, loan .... 
+- account.properties (default) 
+- account-dev.properties (development)
+- account-prod.properties (production)
+
+Example: 
+
+#put the prefix the same as our servie 
+account.msg =Welcome to the Piseth Bank account Default application 
+account.build-version=3
+
+
+#store the configuration in the Map : key(mailDetails.hostName) and value(default-account@piseth.com)
+account.mailDetails.hostName=default-account@piseth.com
+account.mailDetails.port=9000
+account.mailDetails.from=default-account@piseth.com
+account.mailDetails.subject=Your Account Details from Piseth Bank Default Environment
+
+
+#Or we can crete array list [] = value
+account.activeBranches[0]=Phnom Penh
+account.activeBranches[1]=Kompong Cham
+account.activeBranches[2]=Battombong
+
+---------------- 
+3. When we running it create API to access the configuration file 
+- localhost:8071/account/default
+- localhost:8071/account/dev
+- localhost:8071/account/prod 
+
+Note: when we access to dev it also show the default beacaue : របស់ខ្លះយើងអាចប្រើរួមគ្នា ចឹងវាត្រូវការ default 
+ចឹងក្នុងករណីដែលយើងមិនចង់បង្កើតដដែលយើងអាចចាប់ វាជាកត្តាដាក់ជា Defaul config ban 
+
+ដូចជានៅក្នុង dev វាមានទីតាំង location ចឹងមិនចាំបាច់ដាក់ទេយកវាមកដាក់ក្នុង default ban
+Ex 
+
+account.activeBranches[0]=Phnom Penh
+account.activeBranches[1]=Kompong Cham
+account.activeBranches[2]=Battombong
+
+=========================== 
+
+4. In the application.properties:
+
+
+#applicaiotn name put the same servier we provide = configserver
+spring.application.name=configserver
+
+#acces to storage configuration can store in: class path, git, and fild system
+spring.profiles.active=native
+
+spring.cloud.config.server.native.search-locations=classpath:/config-account
+#spring.cloud.config.server.native.search-locations=classpath:/config-card
+#spring.cloud.config.server.native.search-locations=classpath:/config-loan
+
+
+------------- run form class path: 
+
+#spring.cloud.config.server.native.search-locations=file:///C://bankdata//config
+
+
+------------- run from file system:
+
+#servier it is access by port so for account we put 8071, lone 8072, account 8073 example 
+server.port=8071 
+# for 8071 we asign to run port account config service 
+
+
+#server.port=8072
+#server.port=8073
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

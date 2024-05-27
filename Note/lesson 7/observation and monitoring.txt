@@ -1,0 +1,199 @@
+----- Grafana ------- 
+
+1. Add Prometheus (Micrometer) in observation 
+
+step 1: Add dependancy : to translate from Json to Micrometer reader endpoint 
+
+<dependency>
+			<groupId>io.micrometer</groupId>
+			<artifactId>micrometer-registry-prometheus</artifactId>
+</dependency>
+
+step 2: applicatoin.property: add export endpot to the http 
+
+management.endpoint.shutdown.enabled=true
+management.info.env.enabled = true
+management.endpoint.shutdown.enabled=true
+management.endpoints.web.exposure.include=*
+management.metrics.tags.application: ${spring.application.name}
+
+
+step 3: how to add View In centrol Grafana (Interface)
+
+1. Create configera file and create lab for each service 
+
+- create folder Observation >> prometheus >> prometheus.yml
+
+
+global:
+  scrape_interval:     5s # Set the scrape interval to every 5 seconds.
+  evaluation_interval: 5s # Evaluate rules every 5 seconds.
+
+scrape_configs:
+  - job_name: 'account'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: [ 'account:8081' ]
+  - job_name: 'loan'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: [ 'loan:8090' ]
+  - job_name: 'card'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: [ 'card:8070' ]
+  - job_name: 'gatewayserver'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: [ 'gatewayserver:8072' ]
+  - job_name: 'eurekaserver'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: [ 'eurekaserver:9001' ]
+  - job_name: 'configserver'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: [ 'configserver:8071' ]
+
+
+------------------------------------ explain :
+
+scrape_interval:     5s # Set the scrape interval to every 5 seconds. អោយវាទាញទិន្នន័យ ៥ s ម្តង
+evaluation_interval: 5s # Evaluate rules every 5 seconds.​ ពិនិត្យឡើងវិញម្តង់ ៥ វិនាទី
+
+scrape_configs:
+  - job_name: 'account'​ កំណត់ឈ្មោះ server 
+    metrics_path: '/actuator/prometheus' : end point directy to prometheus 
+    static_configs:
+      - targets: [ 'account:8081' ] : read from tap and port number 
+
+------------------ Docker compose prometheus:
+
+  prometheus:
+    image: prom/prometheus:v2.45.0
+    container_name: prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ../observability/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+    extends:
+      file: common.yml
+      service: ms-deploy-network
+
+
+============ explain mount foler configuration file with prometheus
+
+volumes:
+      - ../observability/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+
+1: យើងចេញមកខាងក្រៅ folder មួយ (..) រក folder observability បន្ទាប់មកចូល folder prometheus ហើយរក config file :datasource.yml 
+
+2. ចាប់ពីសញ្ញា : ទៅគឺយើង ភ្ជាប់វាទៅនឹង folder and file storage នឹង​ :/etc/prometheus/prometheus.yml
+
+
+*** Grafana step :
+
+add source configuration file :
+
+1. Create folder grafana in observatbilty >> crate file : datasource.yml
+2. Docker compose and mounthed folder 
+
+grafana:
+    image: grafana/grafana:latest
+    environment:
+      - GF_PATHS_PROVISIONING=/etc/grafana/provisioning
+      - GF_AUTH_ANONYMOUS_ENABLED=true
+      - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
+    depends_on:
+      - gateway
+    entrypoint:
+      - sh
+      - -euc
+      - |
+        /run.sh
+    ports:
+      - "3000:3000"
+    volumes:
+      - ../observability/grafana/datasource.yml:/etc/grafana/provisioning/datasources/datasource.yml
+    healthcheck:
+      test: [ "CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:3000/api/health || exit 1" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    extends:
+      file: common.yml
+      service: ms-deploy-network
+
+====== explain 
+
+
+volumes:
+      - ../observability/grafana/datasource.yml:/etc/grafana/provisioning/datasources/datasource.yml
+
+1: យើងចេញមកខាងក្រៅ folder មួយ (..) រក folder observability បន្ទាប់មកចូល folder Grafana ហើយរក config file :datasource.yml
+
+2. ចាប់ពីសញ្ញាចុតពីរទៅ : ទៅគឺយើង ភ្ជាប់វាទៅនឹង folder and file storage​ configuration នឹង​ :/etc/grafana/provisioning/datasources/datasource.yml
+
+
+----------------- Testing and over view of the Prometheus and Grafana 
+
+check prometheus port : 
+
+http://localhost:9090/targets?search=
+
+
+in status we check for the server up or down 
+
+
+- in the graph we check for the server ruuning 
+
+ex: process_uptime_seconds
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,63 @@
+Challange 6
+
+- External Client : អ្នកខាងក្រៅ Access ចូល Microservice របស់យើងចឹងយើងមិនអោយគេស្គាល់ internal routes យើងទេ
+យើងអោយគេ customer route ==> need to go thorw api get way 
+
+- Customzie router"
+
+@Bean
+	public RouteLocator myRoute(RouteLocatorBuilder builder) {
+		return builder.routes()
+				.route(p -> p
+						.path("/vibolbank/account/**")
+						.filters(f ->f.rewritePath("/vibolbank/account/(?<segment>.*", "/${segment}"))
+						.uri("lb://ACCOUNT")).
+				route(p -> p
+						.path("/vibolbank/loan/**")
+						.filters(f ->f.rewritePath("/vibolbank/loan/(?<segment>.*", "/${segment}"))
+						.uri("lb://LOAN")).
+				
+				route(p -> p
+						.path("/vibolbank/card/**")
+						.filters(f ->f.rewritePath("/vibolbank/card/(?<segment>.*", "/${segment}"))
+						.uri("lb://CARD")).
+				
+				build();				
+						
+	}
+
+- RouteLocator: user for Customer routes 
+- .route(p -> p
+	.path("/vibolbank/account/**")
+	.filters(f ->f.rewritePath("/vibolbank/account/(?<segment>.*", "/${segment}"))
+	.uri("lb://ACCOUNT")).
+
+ពេលវាជួប Url : /vibolbank/account/** -> វានឹងកាត់ចេញអាមុខនឹ​ង (/vibolbank/account) ហើយវាបង្វែរទៅយក URL : uri("lb://ACCOUNT"))
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

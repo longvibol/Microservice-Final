@@ -1,0 +1,122 @@
+Log:
+
+- promtail 
+- loki 
+- grafana 
+
+Metrics:
+
+- Micrometer 
+- promethes 
+- Grafana 
+
+Tracing 
+Distributed tracing encompass three primary concepts:
+
+- Tags serve as Metadata 
+- Trace is unit ID it consists of multiple spans than span across various services. 
+- span is each individual stage of request processing
+
+Ex:
+
+[gatewayserver, 5656, 3030] - tag:gatewayserver; trace ID:5656; span ID:3030
+[account, 5656, 4040] - tag:account; trace ID:5656; span ID:4040
+[loan, 5656, 5050] - tag:loan; trace ID:5656; span ID:5050
+
+
+--------------- Pratice
+
++ Runtime យេីងប្រេីពេលវា  deploy អត់ប្រេីពេល  complie te pel bok brar code
+
+Tracing need three:
+
+- 
+
+
+Step to setup the tracing ID 
+
+- Add configuration 
+
+application.yml need to add in each service 
+
+pattern:
+    level: "%5p [${spring.application.name},%X{trace_id},%X{span_id}]"
+
+-----------------------[
+We customize our corelatio ID by oursleve: 
+
+explain :"%5p [${spring.application.name},%X{trace_id},%X{span_id}]"
+
+-- %5p = log tyep (debug, info, issue ...) 5 មានន័យថាយើងយក ប្រាំអក្សរ
+-- ${spring.application.name} អោយវាចាប់យក Application name 
+-- %X{trace_id},%X{span_id} អោយវាទៅរក Trace id and span id អោយ libery negn inject យើង (អោយវា inject to the log file)
+
+]
+
+- Add Dependancy: 
+
+<properties>
+
+		<otelVersion>1.27.0</otelVersion>
+</properties>
+
+---------------------------------------
+
+<dependency>
+			<groupId>io.opentelemetry.javaagent</groupId>
+			<artifactId>opentelemetry-javaagent</artifactId>
+			<version>${otelVersion}</version>
+			<scope>runtime</scope>
+</dependency>
+
+
+or form : application.property
+
+logging.pattern.level= "%5p [${spring.application.name},%X{trace_id},%X{span_id}]"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

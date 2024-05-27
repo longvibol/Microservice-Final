@@ -1,0 +1,168 @@
+** Resiliency
+
+1. Setup failback : 
+
+- Add fial back anotation : fallbackMethod = "getCustomerDetailDefault" on the main controller :
+
+@CircuitBreaker(name = "customerDetailSuport", fallbackMethod = "getCustomerDetailDefault")
+	@GetMapping("customerdetail/{myCustomerId}")
+	public ResponseEntity<CustomerDetailDTO> getCustomerDetail(@PathVariable("myCustomerId") Long customerId) {
+
+		CustomerDetailDTO dto = new CustomerDetailDTO();
+		Customer customer = customerService.getById(customerId);
+
+		if (customer == null) {
+			throw new RuntimeException("No customer found with this id");
+		}
+
+//		we want to convert from customer to customerDTO 	
+
+		CustomerDTO customerDTO = customerMapper.toCustomerDTO(customer);
+		List<LoanResponseDTO> loanInfo = loanFeignClient.getLoanInfo(customerId);
+		List<CardResponseDTO> cardInfo = cardFeignClient.getCardInfo(customerId);
+
+		/*
+		 * Below where we want to show : private CustomerDTO customer; private
+		 * List<CardResponseDTO> cards; private List<LoanResponseDTO> loans;
+		 * 
+		 */
+
+		dto.setCustomer(customerDTO);
+		dto.setLoans(loanInfo);
+		dto.setCards(cardInfo);
+
+//		dto : is the CustomerDetail we want to set of output
+
+		return ResponseEntity.ok(dto);
+
+	}
+
+
+--------------- add new when main controller fail 
+
+
+public ResponseEntity<CustomerDetailDTO> getCustomerDetailDefault(@PathVariable("myCustomerId") Long customerId,
+			Throwable e) {
+
+		CustomerDetailDTO dto = new CustomerDetailDTO();
+		Customer customer = customerService.getById(customerId);
+
+		if (customer == null) {
+			throw new RuntimeException("No customer found with this id");
+		}
+
+		CustomerDTO customerDTO = customerMapper.toCustomerDTO(customer);
+		dto.setCustomer(customerDTO);
+		
+		System.out.println("Expection show = " +e);
+		return ResponseEntity.ok(dto);
+
+	}
+
+=========================== End 
+
++ Automatic retry in system 
+
+** Retry Pattern : យើងអោយ service នឹងវាធ្វើការហៅម្តងហើយម្តងទៀតទៅតាមចំនួនយើងបានកំណត់
+ដូចជាក្នុងករណី ណេតវើកវា ដាច់
+
+- maxAttempts ធ្វើប៉ុន្មានដង់
+- waitDuration អោយវាចាំសិន
+- retryExceptions លក្ខណបែបណាបានអោយវា ធ្វើការ( ពេលវាជួយ ​error អ្វីមួយ)
+- ignoreExceptions លក្ខណកុំអោយវាធ្វើ
+
+1. Setup : Add property : 
+
+#Register Retry in Actuator 
+resilience4j.retry.configs.default.registerHealthIndicator= true
+resilience4j.retry.instances.retryCustomerDetail.maxRetryAttempts= 3
+resilience4j.retry.instances.retryCustomerDetail.waitDuration= 2000
+
+2. Add Controler where we call to another service : 
+
+@Retry(name = "retryCustomerDetail", fallbackMethod = "getCustomerDetailDefault")
+
+
+*** Rate Limited Pattern យើងកំណត់ចំនួន ហៅលើ service របស់យើងក្នុងរយៈពេលកំណត់ណាមួយ 
+Stop Overloading to prevend: DDos Attached 
+
+- timeoutDuration រយៈពេលទទួល ហៅ (៣០ វិនាទីចាំទទួលបន្ទាប់ពេលវាហៅពេញ)​
+- limitForPeriod រយៈពេលកំណត់នឹងចង់ទទួលប៉ុន្មាន ការហៅ
+- limiRefreshPeriod : reset period (បន្ទាប់ពីវាមិនទទួល ការហៅ ហើយ វានឹង រាប់ឡើងវិញ បើដល់ចំនួនកំណត់វា ឈប់ទទួល ការហៅទៀត)​
+
+
+Step to do : 
+
+1 . Add property :
+
+#rateLimiter 
+resilience4j.ratelimiter.configs.default.registerHealthIndicator= true
+resilience4j.ratelimiter.instances.sayHelloLimiter.timeoutDuration=5000
+resilience4j.ratelimiter.instances.sayHelloLimiter.limitRefreshPeriod=5000
+resilience4j.ratelimiter.instances.sayHelloLimiter.limitForPeriod=1
+
+2. Controller 
+
+@GetMapping("/sayHello")
+	@RateLimiter(name = "sayHelloLimiter", fallbackMethod = "sayHi")
+	public String sayHello() {
+		return "Hello, welcome to PisethBank";
+	}
+	
+	public String sayHi(Throwable t) {
+		return "Call back HI, welcome to PisethBank";
+	}
+
+
+
+================ End
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

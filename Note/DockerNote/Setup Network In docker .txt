@@ -1,0 +1,69 @@
+*** Setup Network In docker *** 
+
+1. Create network in Docker to conneciton inside docker container 
+
+>> docker network ls (show list network in docker container)
+>> docker network create cambodia (create network name cambodia) 
+>> docker network ls : show all the network 
+
+2. Create container:  
+Go to directory folder have Docker file postgres docker(can search for postgres images in gitHub: 
+
+FROM postgres:14
+ENV POSTGRES_USER account
+ENV POSTGRES_PASSWORD account123
+ENV POSTGRES_DB account_service 
+
+>> docker build . -t postgres_db
+
+---- Run images need to connecto network : 
+
+>> docker run -p 5432:5432 --net cambodia --name mydb postgres_db (crate postgres)
+#docker file#
+
+Go to directory folder have Docker file from Jar file: 
+
+>> docker build . -t vibolbank/account
+>> docker run -p 5050:5050 --net cambodia --name myap vibolbank/account
+
+in the propertiry file: 
+------------------------
+
+server.port = 5050
+
+spring.datasource.url= jdbc:postgresql://mydb:5432/account_service
+
+spring.datasource.username= account
+spring.datasource.password= account123
+
+spring.jpa.properties.hibernate.jdbc.lob.non_contextual_creation=ture
+spring.jpa.properties.hibernate.dialect= org.hibernate.dialect.PostgreSQLDialect
+spring.jpa.hibernate.ddl-auto=update
+
+
+--------------------------------------------------------------
+
+Docker File in account: 
+
+FROM openjdk:17
+MAINTAINER namelbank
+COPY target/account-account.jar account-account.jar
+ENTRYPOINT [ "java","-jar","/account-account.jar" ]
+
+=============================== 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,159 @@
+Challenge 5 : Resilency (ភាពធន)
+
+- Cascading failures: បើមាន service មួយណាអត់ដើរវាអត់ដើរទាំងអស់
+- Chain : ហៅតៗគ្នា
+- configer timeout : to make the network low limited issue (block request or fall fasll)
+- fault tolerance: component have problem it still maintance to work 
+- Thread : អ្នកទទួល Request 
+
+==> we use Resilience4J (4 Java)
+
+5 partern:
+
++ Circuit breaker: ប្រើសម្រាប់ service មានបញ្ហាពេល invoked = called 
++ Fallback: ផ្តល់ Detault value 
++ Retry: ព្យាយាមម្តងទៀត ម្តង ពីរ ដង់
++ Rate Limit: កំណត់ចំនួន ហៅ or request (DDos Attached) 
++ Bulkhead: កំណត់ចំនួនកន្លែង ធ្លាយកុំអោយវា ធាយច្រើនកន្លែង 
+
+
+=============== Circuit Breaker 
+
+- Close it working
+- Open Not working 
+
+CB : វាមើលបើហៅច្រើនពេក ហើយមើលទៅវាមិនស្រួលទេ អោយវា សំរាក់សិន ដូចវាយបុកចឹងបើ មើលទៅមិនស្រួលហៅមករាប់សិន
+ក្នុងរយៈពេលកំណត់ណាមួយវានឹងបើកឡើងវិញ
+
+Advantage:
+- Fail fast: ឆ្លើយតបលឿបពេលវាបរាជ័យ
+- Fail gracefull
+- Recover seamlessly
+
+1 =============== Dependency : 
+
+		<dependency>
+			<groupId>io.github.resilience4j</groupId>
+			<artifactId>resilience4j-spring-boot2</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>io.github.resilience4j</groupId>
+			<artifactId>resilience4j-circuitbreaker</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>io.github.resilience4j</groupId>
+			<artifactId>resilience4j-timelimiter</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-aop</artifactId>
+		</dependency>
+
+
+*** Timelimiter : for Rate limite time 
+
+**** aop use for fail back algorithem: 
+
+We put on the server call to another service So we put in the account server Pom.xml and put add the customerController detail 
+
+2 ===== add property 
+
+resilience4j.circuitbreaker.configs.default.registerHealthIndicator= true
+resilience4j.circuitbreaker.instances.customerDetailSupport.minimumNumberOfCalls= 5
+resilience4j.circuitbreaker.instances.customerDetailSupport.failureRateThreshold= 50
+resilience4j.circuitbreaker.instances.customerDetailSupport.waitDurationInOpenState= 30000
+resilience4j.circuitbreaker.instances.customerDetailSupport.permittedNumberOfCallsInHalfOpenState=2
+
+
+
+resilience4j.circuitbreaker.configs.default.registerHealthIndicator = ចុះឈ្មោះក្នុង Acuator 
+
+resilience4j.circuitbreaker.instances."name of in circute braker we put ".minimumNumberOfCalls= 5
+
+- minimumNumberOfCalls = 5 = Call 5 time (5 request call)
+- failureRateThreshold = 50 (50 % of call) 
+- waitDurationInOpenState= 30000 (1 s = 1000milisecond)  = 30 វិនាទី
+- permittedNumberOfCallsInHalfOpenState=2​​ = ពេលវាស្ថិតនៅ halfopen static ory vir yuk ta 2 te 
+
+
+
+
+============= Checkd it is working or not in the Circuit breaker
+
+"circuitbreakerevents": {
+"href": "http://192.168.1.167:8080/actuator/circuitbreakerevents",
+"templated": false
+},
+
+
+===============  flow 
+1. ពេលហៅលើទីមួយហើយវាមិនមានការឆ្លើយតបពី Service 
+
+"circuitBreakerName": "customerDetailSuport",
+"type": "ERROR",'
+
+វាចេញ Error 3 x Time 
+
+Then it will change the status to : FAILURE_RATE_EXCEEDED
+
+"circuitBreakerName": "customerDetailSuport",
+"type": "FAILURE_RATE_EXCEEDED",  
+
+
+ពេលយើង ហៅវាទៀតវាចេញ : TATE_TRANSITION
+
+
+"circuitBreakerName": "customerDetailSuport",
+"type": "STATE_TRANSITION",
+
+2. Then It will become open Circuit : Fail fast : NOT_PERMITTED
+
+"circuitBreakerName": "customerDetailSuport",
+"type": "NOT_PERMITTED",
+
+
+3. When we restart the service it will change to : 
+
+
+SUCCESS(1) -> STATE_TRANSITION(1) -> SUCCESS
+
+
+================  
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

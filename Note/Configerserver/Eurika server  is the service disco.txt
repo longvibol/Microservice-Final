@@ -1,0 +1,71 @@
+Eurika server : is the service discovery Agent 
+
+1. 
+
+http://localhost:9000/eureka/apps/account
+
+
+2. Devependcy
+
+<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
+		</dependency>
+
+
+----------------------------------
+<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>org.springframework.cloud</groupId>
+				<artifactId>spring-cloud-dependencies</artifactId>
+				<version>${spring-cloud.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+
+---------------------
+
+<properties>
+		<java.version>17</java.version>
+		<spring-cloud.version>2023.0.1</spring-cloud.version>
+	</properties>
+
+---------------
+
+spring.application.name=card
+
+
+
+
+3. applicaton.property
+
+#Eureka Server configuration
+eureka.instance.preferIpAddress=true
+#we register with eureka server with Ip address
+
+eureka.client.registerWithEureka=true
+#every client register with eureka anable 
+
+eureka.client.fetchRegistry=true
+#loadbance for register called
+
+eureka.client.serviceUrl.defaultZone=http://localhost:9000/eureka/
+
+info.app.name = Account Microservice
+info.app.description = Piseth Bank Account App
+info.app.version = 1.0.0
+management.info.env.enabled = true
+
+
+4. 
+
+
+
+
+
+
+
+
