@@ -16,7 +16,6 @@ import com.piseth.card.entity.Card;
 import com.piseth.card.mapper.CardMapper;
 import com.piseth.card.service.CardService;
 
-import jakarta.validation.constraints.AssertFalse.List;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j

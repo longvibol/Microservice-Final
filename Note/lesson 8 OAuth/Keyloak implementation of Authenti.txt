@@ -1,0 +1,389 @@
+**** Keyloak implementation of Authentication and authuri ****
+
+Website: https://www.keycloak.org/guides
+
+Docker file: 
+
+docker run -d -p 9090:8080 -e KEYCLOAK_ADMIN=admin -e KEYCLOAK_ADMIN_PASSWORD=admin quay.io/keycloak/keycloak:24.0.4 start-dev
+
+
++ docker run -d -p 8080:8080 = command and port 
++ -e KEYCLOAK_ADMIN=admin -e KEYCLOAK_ADMIN_PASSWORD=admin = enviroment User and Password 
++ quay.io/keycloak/keycloak:24.0.4 = Image file 
++ start-dev = Command start 
+
+
+---------------------------------------------  
+
+Keyword 
+
+- Master realm = ជា profile របស់យើង ជា develpment or QA 
++ គោលបំណង់ចង់ដាក់ security លើ system របស់យើង អោយ back end can talk to backend (client grante) 
+=> ដូចនេះ 
+
+gateway : resource server
+Keycloak : auth server 
+
+1. How to create client (អ្នកណាចង់ access មកsystem យើងត្រូវអោយវាឆ្លង់កាត់ keycloak សិន
+
+- Go to Create client -> chose Client type: OpenID Connect 
+- Client ID (ជាឈ្មោះស្ថាប័ន្ថដែលយើងចង់អោយមានទំ២ជាមួយយើង)
+
+ex: vibolbank-marketing-cc (cc credential) បើវាជា User យើងប្រើអីចំនាំផ្សេងទៅ
+
+2. Step two : Capability config
+
+chose Service accounts roles ( Client Credentials Grant flow) two system interaction 
+
+3. Go to Credentials : find Client Secret 
+
+Client Secret  (password របស់ system) 
+
+tdLg0uSxUovDtaGywa2BrJrPsZDeQDIo
+
+
+-------------------- How to do testing 
+
+**** Important : go to Realm setting :
+
+Endpoints : OpenId Endpoint Configuration 
+
+- find generate token URL: 
+
+http://localhost:8090/realms/master/protocol/openid-connect/token
+
+- Goto Post Man Create Post request: 
+
+http://localhost:8090/realms/master/protocol/openid-connect/token
+
+Chose : x-www-form-urlencoded 
+
+1. grant_types		:	client_credentials
+
+How to search for grant_types: go to endpoint in th keyloak: find grant_types support json list: 
+
+"grant_types_supported": [
+"authorization_code",
+"implicit",
+"refresh_token",
+"password",
+"client_credentials",
+"urn:openid:params:grant-type:ciba",
+"urn:ietf:params:oauth:grant-type:device_code"
+],
+
+
+-------------------------------------------------------- 
+
+
+2. client_id 		:	vibolbank-marketing-cc
+3. Client Secret	:	tdLg0uSxUovDtaGywa2BrJrPsZDeQDIo 
+
+Go to Client scopes in the keycloak 
+
+4. scope		: 	openid email profile
+
+In Post Man we put as below to generate Tokent 
+
+- grant_type: client_credentials
+- client_id:vibolbank-marketing-cc
+- client_secret:tdLg0uSxUovDtaGywa2BrJrPsZDeQDIo
+- scope:openid email profile
+
+----------------------------- How to check token 
+
+openid : បង្ហាញពី Profile បើយើងអត់ដាក់វាអត់ generator អោយយើងទេ
+
+Go to https://jwt.io/
+
+-> Put our token generated 
+
+
+===== Now we success for generate tokeng CC and Auth server ---->
+
+Now next step we connect to Gateway server របស់យើង
+
+What we need are : Spring security and auth.2 dependency add to gateway then disable port in each service. 
+in order to Gateway server forward request to our service 
+
+------------ how to connect from Gateway to Auth Server 
+
+We go to Endpoint in Keyloak then find certs URL: inorder to setup gateway and auth server know each order 
+
+
+http://localhost:9090/realms/master/protocol/openid-connect/certs
+
+
+
+----------------------- in Gateway create new class (config)
+
+
+Class name: SecurityConfig in class .config
+
+@Bean
+    public SecurityWebFilterChain springSecurityFilterChain(ServerHttpSecurity serverHttpSecurity) {
+        serverHttpSecurity.authorizeExchange(exchanges -> exchanges.pathMatchers(HttpMethod.GET).permitAll()
+                .pathMatchers("/pisethbank/account/**").hasRole("ACCOUNT")
+                .pathMatchers("/pisethbank/card/**").hasRole("CARD")
+                .pathMatchers("/pisethbank/loan/**").authenticated())
+                .oauth2ResourceServer(oAuth2ResourceServerSpec -> oAuth2ResourceServerSpec
+                        .jwt(Customizer.withDefaults()));
+        serverHttpSecurity.csrf(csrfSpec -> csrfSpec.disable());
+        return serverHttpSecurity.build();
+    }
+
+
+explain: យើងត្រូវបង្កើត Filter Chain ដើម្បីពីណាក៏ដោយពេលចង់ Request ត្រូវការឆ្លើងកាត់យើង 
+ដែលបង្កើត file មួយថា exchanges -> 
+
+serverHttpSecurity.authorizeExchange(exchanges -> exchanges.pathMatchers(HttpMethod.GET).permitAll()
+
+(white list) 
+តាមរយៈ Method GET: យើងអោយវាចូលបានទាំំងអស់ ក្រៅពីនឹងគឺមិនអោយទេ​
+
+បើចង់បិទទាំំងអស់លុប អានឹងចោល : exchanges -> exchanges.pathMatchers(HttpMethod.GET).permitAll()
+
+
+------------------- 
+
+.pathMatchers("/pisethbank/account/**").hasRole("ACCOUNT") អីក៏ដោយអោយតែឆ្លងកាត់ pisethbank ត្រូវធ្វើការ ពិនិត្យសិនមាន authenticated អត់
+
+
+--------------------
+
+.oauth2ResourceServer(oAuth2ResourceServerSpec -> oAuth2ResourceServerSpec
+                        .jwt(Customizer.withDefaults()));
+
+
+យើងប្រើ default អោយវាផ្ទាង់ផ្ទាត់ជាមួយ Auth server sinh 
+
+
+---------------- disable csrf
+
+serverHttpSecurity.csrf(csrfSpec -> csrfSpec.disable());
+
+
+-------------- ចុងក្រោយយើង បង្កើត security របស់យើង
+
+ return serverHttpSecurity.build();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

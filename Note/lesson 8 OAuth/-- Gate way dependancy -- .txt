@@ -1,0 +1,153 @@
+-- Gate way dependancy -- 
+
+<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-security</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.security</groupId>
+			<artifactId>spring-security-oauth2-resource-server</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.security</groupId>
+			<artifactId>spring-security-oauth2-jose</artifactId>
+		</dependency>
+	</dependencies>
+
+
+=========================================================
+application.property
+
+spring.security.oauth2.resourceserver.jwt.jwk-set-uri="http://localhost:9080/realms/master/protocol/openid-connect/certs"
+
+
+
+============= Docer file
+
+keycloak:
+    image: quay.io/keycloak/keycloak:23.0.4
+    container_name: keycloak
+    ports:
+      - "9090:8080"
+    environment:
+      KEYCLOAK_ADMIN: "admin"
+      KEYCLOAK_ADMIN_PASSWORD: "admin"
+    command: "start-dev"
+    extends:
+      file: common.yml
+      service: ms-deploy-network
+
+
+------------------ gateway 
+
+
+gatewayserver:
+    image: pisethbank/gatewayserver:v2
+    container_name: gatewayserver-ms
+    ports:
+      - "8072:8072"
+    depends_on: 
+      account:
+        condition: service_healthy
+      card:
+        condition: service_healthy
+      loan:
+        condition: service_healthy
+    environment:
+      SPRING_APPLICATION_NAME: "gatewayserver"
+      OTEL_SERVICE_NAME: "gatewayserver"
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK-SET-URI: "http://keycloak:8080/realms/master/protocol/openid-connect/certs"  
+    extends:
+      file: common.yml
+      service: ms-base-eurekaserver
+
+
+==================================== class: config (SecurityConfig.java
+
+package com.piseth.bank.gatewayserver.config;
+
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.core.convert.converter.Converter;
+import org.springframework.http.HttpMethod;
+import org.springframework.security.authentication.AbstractAuthenticationToken;
+import org.springframework.security.config.Customizer;
+import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
+import org.springframework.security.config.web.server.ServerHttpSecurity;
+import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
+import org.springframework.security.oauth2.server.resource.authentication.ReactiveJwtAuthenticationConverterAdapter;
+import org.springframework.security.web.server.SecurityWebFilterChain;
+
+import reactor.core.publisher.Mono;
+
+@Configuration
+@EnableWebFluxSecurity
+public class SecurityConfig {
+	
+	@Bean
+    public SecurityWebFilterChain springSecurityFilterChain(ServerHttpSecurity serverHttpSecurity) {
+        serverHttpSecurity.authorizeExchange(exchanges -> exchanges.pathMatchers(HttpMethod.GET).permitAll()
+                .pathMatchers("/pisethbank/account/**").hasRole("ACCOUNT")
+                .pathMatchers("/pisethbank/card/**").hasRole("CARD")
+                .pathMatchers("/pisethbank/loan/**").authenticated())
+                .oauth2ResourceServer(oAuth2ResourceServerSpec -> oAuth2ResourceServerSpec
+                        //.jwt(Customizer.withDefaults()));
+                		.jwt(t -> t.jwtAuthenticationConverter(grantedAuthorityExtractor())));
+        serverHttpSecurity.csrf(csrfSpec -> csrfSpec.disable());
+        return serverHttpSecurity.build();
+    }
+	
+	private Converter<Jwt, Mono<AbstractAuthenticationToken>> grantedAuthorityExtractor(){
+		
+		JwtAuthenticationConverter authenticationConverter = new JwtAuthenticationConverter();
+		authenticationConverter.setJwtGrantedAuthoritiesConverter(new KeyclockJwtConverter());
+		
+		return new ReactiveJwtAuthenticationConverterAdapter(authenticationConverter);
+	}
+	
+	
+}
+
+
+======================================
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
