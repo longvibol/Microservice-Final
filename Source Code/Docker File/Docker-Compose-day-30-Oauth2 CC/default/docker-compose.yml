@@ -11,7 +11,7 @@ services:
       KEYCLOAK_ADMIN_PASSWORD: "admin"
     command: "start-dev"
     volumes:
-        - keycloak-data-volume:/var/lib/keycloak/data
+      - .local/keycloak/:/opt/jboss/keycloak/standalone/data/
     extends:
       file: common.yml
       service: ms-deploy-network
