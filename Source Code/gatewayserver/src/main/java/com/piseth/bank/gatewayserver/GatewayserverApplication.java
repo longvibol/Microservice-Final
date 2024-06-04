@@ -18,12 +18,12 @@ public class GatewayserverApplication {
 	@Bean
 	public RouteLocator myRoutes(RouteLocatorBuilder builder) {
 	    return builder.routes()
-	        .route(p -> p
-	            .path("/vibolbank/customer/**")
-	            .filters(f -> f.rewritePath("/vibolbank/customer/(?<segment>.*)","/${segment}")
-	            .addResponseHeader("X-RESPONSE-TIME", LocalDateTime.now().toString()))
-	            		
-	            .uri("lb://CUSTOMER"))
+//	        .route(p -> p
+//	            .path("/vibolbank/customer/**")
+//	            .filters(f -> f.rewritePath("/vibolbank/customer/(?<segment>.*)","/${segment}")
+//	            .addResponseHeader("X-RESPONSE-TIME", LocalDateTime.now().toString()))
+//	            		
+//	            .uri("lb://CUSTOMER"))
 	        
 	        .route(p -> p
 		            .path("/vibolbank/account/**")
