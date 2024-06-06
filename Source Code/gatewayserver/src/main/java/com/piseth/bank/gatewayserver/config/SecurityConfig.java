@@ -23,7 +23,7 @@ public class SecurityConfig {
 	@Bean
     public SecurityWebFilterChain springSecurityFilterChain(ServerHttpSecurity serverHttpSecurity) {
         serverHttpSecurity.authorizeExchange(exchanges -> exchanges.pathMatchers(HttpMethod.GET).permitAll()
-                .pathMatchers("/vibolbank/account/**").hasRole("ACCOUNT")
+                .pathMatchers("/vibolbank/account/**").authenticated()
                 .pathMatchers("/vibolbank/card/**").hasRole("CARD")
                 .pathMatchers("/vibolbank/loan/**").authenticated())
                 .oauth2ResourceServer(oAuth2ResourceServerSpec -> oAuth2ResourceServerSpec
