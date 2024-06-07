@@ -2,7 +2,7 @@ version: "3.8"
 services:
 
   keycloak:
-    image: quay.io/keycloak/keycloak:24.0.4
+    image: quay.io/keycloak/keycloak:24.0.5
     container_name: keycloak
     ports:
       - "9080:8080"
@@ -139,7 +139,7 @@ services:
         condition: service_healthy  
     environment:
       SPRING_APPLICATION_NAME: "gatewayserver"
-      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK-SET-URI: http://localhost:9080/realms/master/protocol/openid-connect/certs
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK-SET-URI: http://localhost:8080/realms/master/protocol/openid-connect/certs
       OTEL_SERVICE_NAME: "gatewayserver"  
 
     extends:
@@ -230,7 +230,7 @@ services:
     image: prom/prometheus:v2.45.0
     container_name: prometheus
     ports:
-      - "9092:9092"
+      - "9090:9090"
     volumes:
       - ../observability/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
     extends:
