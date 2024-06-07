@@ -22,27 +22,24 @@ public class SecurityConfig {
 	
 	@Bean
     public SecurityWebFilterChain springSecurityFilterChain(ServerHttpSecurity serverHttpSecurity) {
-        serverHttpSecurity.authorizeExchange(exchanges -> exchanges.pathMatchers(HttpMethod.GET).permitAll()
-                .pathMatchers("/vibolbank/account/**").authenticated()
+        serverHttpSecurity.authorizeExchange(exchanges -> exchanges.pathMatchers(HttpMethod.POST).permitAll()
+                .pathMatchers("/vibolbank/account/**").hasRole("ACCOUNT")
                 .pathMatchers("/vibolbank/card/**").hasRole("CARD")
                 .pathMatchers("/vibolbank/loan/**").authenticated())
                 .oauth2ResourceServer(oAuth2ResourceServerSpec -> oAuth2ResourceServerSpec
-//                        .jwt(Customizer.withDefaults()));
+                        //.jwt(Customizer.withDefaults()));
                 		.jwt(t -> t.jwtAuthenticationConverter(grantedAuthorityExtractor())));
         serverHttpSecurity.csrf(csrfSpec -> csrfSpec.disable());
-<<<<<<< HEAD
         return serverHttpSecurity.build();
-    }	
-=======
-        return serverHttpSecurity.build(); 
     }
 	
 	private Converter<Jwt, Mono<AbstractAuthenticationToken>> grantedAuthorityExtractor(){
 		
 		JwtAuthenticationConverter authenticationConverter = new JwtAuthenticationConverter();
 		authenticationConverter.setJwtGrantedAuthoritiesConverter(new KeyclockJwtConverter());
+		
 		return new ReactiveJwtAuthenticationConverterAdapter(authenticationConverter);
 	}
 	
->>>>>>> 0095d6d9394f881b007d492c90c8f84b6775eac4
+
 }

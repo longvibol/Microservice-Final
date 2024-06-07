@@ -17,6 +17,10 @@ public class KeyclockJwtConverter implements Converter<Jwt, Collection<GrantedAu
 		Map<String, Object> realmAccess = (Map<String, Object>) jwt.getClaims().get("realm_access");
 		
 		List<String> roles = (List<String>) realmAccess.get("roles");
+		
+		
+		//ROLE_ACCOUNT ទំរង់វាចឹង នៅក្នុង spring security
+		
 		return roles.stream()
 			.map(role -> new SimpleGrantedAuthority("ROLE_" + role))
 			.collect(Collectors.toList());		

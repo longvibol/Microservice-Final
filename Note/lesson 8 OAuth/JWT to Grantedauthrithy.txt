@@ -1,0 +1,34 @@
+git clone --single-branch --branch day_31_role_security https://github.com/pisething/microservices_course.git
+
+
+
+- Crate Role in Keycloak 
+
++ go to KK ==> Realm roles -> create role ( យើងអាចបង្កើត Role ច្រើន ហើយ Role នឹងវាអាចមានសិទ្ននៅតាមផ្នែកផ្សេងៗ ដូចជា គណនី, it, management ...) ចឹងវាជា collection list 
+
+What we want to do it convert from JWT to GrantedAuthority()
+
+- Collection<GrantedAuthority> 
+- Key:value (Map) 
+
+========================= យើងចាប់យកតម្លៃ jwt convert to GrantedAuthority 
+
+"realm_access": {
+    "roles": [
+      "ACCOUNT",
+      "default-roles-master",
+      "offline_access",
+      "uma_authorization"
+    ]
+  },
+
+--------------- យកវាមក បំលែងជា GrantedAuthority
+
+
+
+
+
+
+=========================
+
++ 

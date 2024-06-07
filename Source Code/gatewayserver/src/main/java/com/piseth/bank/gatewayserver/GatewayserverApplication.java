@@ -18,32 +18,24 @@ public class GatewayserverApplication {
 	@Bean
 	public RouteLocator myRoutes(RouteLocatorBuilder builder) {
 	    return builder.routes()
-//	        .route(p -> p
-//	            .path("/vibolbank/customer/**")
-//	            .filters(f -> f.rewritePath("/vibolbank/customer/(?<segment>.*)","/${segment}")
-//	            .addResponseHeader("X-RESPONSE-TIME", LocalDateTime.now().toString()))
-//	            		
-//	            .uri("lb://CUSTOMER"))
-	        
 	        .route(p -> p
-		            .path("/vibolbank/account/**")
-		            .filters(f -> f.rewritePath("/vibolbank/account/(?<segment>.*)","/${segment}")
-		            .addResponseHeader("X-RESPONSE-TIME", LocalDateTime.now().toString()))
-		            		
-		            .uri("lb://ACCOUNT")).
-	      
+	            .path("/vibolbank/account/**")
+	            .filters(f -> f.rewritePath("/vibolbank/account/(?<segment>.*)","/${segment}")
+	            		
+	            		.addResponseHeader("X-RESPONSE-TIME", LocalDateTime.now().toString()))
+	            				
+	            .uri("lb://ACCOUNT")).
 	        route(p -> p
 		            .path("/vibolbank/loan/**")
-		            .filters(f -> f.rewritePath("/vibolbank/loan/(?<segment>.*)","/${segment}")
-		            .addResponseHeader("X-RESPONSE-TIME", LocalDateTime.now().toString()))
+		            .filters(f -> f.rewritePath("/vibolbank/loan/(?<segment>.*)","/${segment}"))
 		            		
 		            .uri("lb://LOAN")).
 	        route(p -> p
 		            .path("/vibolbank/card/**")
-		            .filters(f -> f.rewritePath("/vibolbank/card/(?<segment>.*)","/${segment}")
-		            .addResponseHeader("X-RESPONSE-TIME", LocalDateTime.now().toString()))
+		            .filters(f -> f.rewritePath("/vibolbank/card/(?<segment>.*)","/${segment}"))
 		            		
 		            .uri("lb://CARD")).build();
 	}
+
 
 }
