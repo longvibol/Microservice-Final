@@ -1,8 +1,8 @@
 Oauth2 Terminology 
 
-ពេលយើងប្រើ Oauth2 យើងអោយសិទ្ធទៅ  Third party access ទៅ resource របស់យើង 
+ពេលយើងប្រើ Oauth2 យើងអោយកំណត់សិទ្ធទៅ  Third party access ទៅ resource របស់យើង 
 
-- Resource Owner : our account- It is you the end user. 
+- Resource Owner : our account​ - It is you the end user. 
 - Client : Website, mobile app or API ដែលមានទំនាក់ទំនងជាមួយ resource owner
 - Authorization Server : គឺជា server ដែលរក្សាទុកនូវ Resource Owner Account, It authorization logic acts as Authorization server. 
 - Resource Server - ជាកន្លែងដែល Resource client (Webite, api..) hosting

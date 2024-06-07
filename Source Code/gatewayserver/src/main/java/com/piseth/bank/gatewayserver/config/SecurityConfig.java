@@ -24,7 +24,5 @@ public class SecurityConfig {
                         .jwt(Customizer.withDefaults()));
         serverHttpSecurity.csrf(csrfSpec -> csrfSpec.disable());
         return serverHttpSecurity.build();
-    }
-
-	
+    }	
 }
