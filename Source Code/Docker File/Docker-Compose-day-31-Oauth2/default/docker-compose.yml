@@ -2,7 +2,7 @@ version: "3.8"
 services:
 
   keycloak:
-    image: quay.io/keycloak/keycloak:24.0.5
+    image: quay.io/keycloak/keycloak:24.0.4
     container_name: keycloak
     ports:
       - "9080:8080"
@@ -10,11 +10,28 @@ services:
       KEYCLOAK_ADMIN: "admin"
       KEYCLOAK_ADMIN_PASSWORD: "admin"
     command: "start-dev"
-    volumes:
-      - .local/keycloak/:/opt/jboss/keycloak/standalone/data/
     extends:
       file: common.yml
       service: ms-deploy-network
+  gatewayserver:
+    image: vibollong/gatewayserver:v2
+    container_name: gatewayserver-ms
+    ports:
+      - "8072:8072"
+    depends_on: 
+      account:
+        condition: service_healthy
+      card:
+        condition: service_healthy
+      loan:
+        condition: service_healthy  
+    environment:
+      SPRING_APPLICATION_NAME: "gatewayserver"
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK-SET-URI: http://keycloak:8080/realms/master/protocol/openid-connect/certs
+      OTEL_SERVICE_NAME: "gatewayserver"  
+    extends:
+      file: common.yml
+      service: ms-base-eurekaserver
 
   configserver:
     image: vibollong/configserver:v2
@@ -121,27 +138,6 @@ services:
       MONGODB_HOST_NAME: mongodb
       SPRING_APPLICATION_NAME: "loan"
       OTEL_SERVICE_NAME: "loan"
-    extends:
-      file: common.yml
-      service: ms-base-eurekaserver
-
-  gatewayserver:
-    image: vibollong/gatewayserver:v2
-    container_name: gatewayserver-ms
-    ports:
-      - "8072:8072"
-    depends_on: 
-      account:
-        condition: service_healthy
-      card:
-        condition: service_healthy
-      loan:
-        condition: service_healthy  
-    environment:
-      SPRING_APPLICATION_NAME: "gatewayserver"
-      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK-SET-URI: "http://localhost:8080/realms/master/protocol/openid-connect/certs"
-      OTEL_SERVICE_NAME: "gatewayserver"  
-
     extends:
       file: common.yml
       service: ms-base-eurekaserver
