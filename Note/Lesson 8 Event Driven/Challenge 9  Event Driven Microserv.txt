@@ -1,0 +1,326 @@
+Challenge 9 : Event Driven Microservices 
+
+- Avoiding temporal coupling whenever possible 
+- Synchronous communication: យើង ហៅភ្លាមឆ្លើយភ្លាម
+- Asynchonous = អាយកូម ស្តាប់ចប់បានឆ្លើយ
+- 1 thread per request (គេកំណត់មុនថា មានប៉ុន្មាន thread បានពេញ Thread full) 
+
+==> ពេលវាហៅ មកពេញចឹងវាធ្វើអោយ system full then it make temporal coupling 
+
+synchoronous Vs Asynchronous 
+
+Synchor
+
+- check ballance in account bank 
+
+Asynchronouse
+
+- ពេលយើងចុះឈ្មោះក្នុងធានាគារបង្កើត គណនីយើងអាចផ្ញើរ email អោយគេតាមក្រោយបាន
+
+Note 
+
+- GET Request : we use synchor communication 
+- POST, DELET, PUT : we can use Asychronus
+
+How to create Asynchorus communication 
+
+- An event is an incident(ជាព្រឹត្តិការ, ជា request, ការលុប etc) អ្វីៗដែលបានកើតឡើងនៅក្នុង system 
+- event driven microservice គឺជាអ្វីដែលយើងចង់អោយវាមានទំនាក់ទំនងជាមួយ ប្រភពដទៃផ្សេងទៀត ដូចជា 
+Alert the concerned parties. 
+
+==> we use Event-driven architecture to build Event-driven microservice 
+ដោយប្រើ producing (អ្នកផលិត) and consuming event(អ្នកប្រើ)​ ហើយវាទាក់ទងគ្នាដោយប្រើ using Async communication,
+event brokers(អ្នកសំរប់សំរួល)​
+
+- គេប្រើ lastest technology : Spring Cloud Function and Spring Cloud Stream (libaryly) 
+
+
+==================== Event-driven Models Have: Event-driven architecture can be build using two primary: 
+
+គេប្រើ ពីរ គឺ Publisher/Subscriber (Pub/Sub) Model និង Event Streaming Model 
+
+1. Publisher/Subcscriber: revolve around subcriptions
+
+Producers generate events that are distributed to all subscribers for cosumption.
+- មានន័យថា បើ event នឹងត្រូវបានបង្កើតឡើងហើយ subcribers ទាំងអស់នឹងបានទទួល
+event នឹងតែបើមាន subsriber ថ្មីមកទៀត អា Event ចាស់ៗ នឹងវាមិនបានទទួលទេ
+
+
+2. Event Streaming Model 
+
+នៅក្នុង Model នេះសម្រាប់រាល់ events ទាំងអស់ត្រូវបានធ្វើការកត់ Write to a log in the 
+sequential manner( តាមលំដាប់លំដោយ)==> នាំ ប្រើប្រាស់ consumers ថ្មីចូលមកក៏អាចប្រើប្រាស់
+event នឹងបានដែល។
+
+================== Implement Asychonuse communication 
+
+1-RabbitMQ useing Pub/Sub
+2-Apache Kafka using Event Streaming Model (more popular)
+
+EX: យើងខ្ចីលុយធានាគា តាម ABA ហើយយើង បង់លុយតាម Wing ចឹង ABA គាត់មាន Service មួយ
+អាចអោយ Wing គាត់បង់លុយបានតាម Wing ចឹងគឺគេប្រើ Asynchorous communication 
+
+- អតិថិជន ទៅកន្លែង Wing ហើយគាត់យក លេខកុងដែលត្រូវបង់លុយនឹងមក បញ្ចូលនៅកន្លែង Wing 
+==> Wing នឹង call server របស់ ABA នឹង (POST method was used)
+
+During these process can have problem:
+- slow service 
+- network problem 
+
+==> នាំអោយអ្នកលំបាក់ is customer 
+
+Soluciton we use Kafka 
+
+1. first then the customer come to the counter we use GET method to verifiy the information 
+then it will show how much they will pay (ex:200$)
+
+2. the customer pay 200$ then it will store at Wing data ==> then tell the customer succefuly 
+
+ចឹងបន្ទាប់មក Wing process Qure request to ABA តាមលំដាប់លំដោយ​ (we connect in background) 
+
+=============================================== Partice concept 
+
+1. We want to create account to our server then it will message to phone for successfull create account 
+2. Account Service(1,2) -> Event Broker(3) <-> Message Services(4) 
+
+ពេលយើងបង្កើតគណនីហើយ នៅក្នុង Account Service វានឹងបង្កើត Event មួយសម្រាប់ Event Brokder 
+ដើម្បីទទួលពត៌មានផង និងប្រាប់ ពត៌មានផង
+
+(3) Event Broker វានឹងបង្កើត Queue (firsth in first out) then it send message to (4)
+after (4) get the correct event (4) will generate the publice event that (4) have sent the message to 
+(1) Account server ដើម្បី update colume ផងថាខ្ញុំបានផ្ញើរ email អោយគេហើយហើយ 
+
+Ex: in side Account Service have colume that have boolent 
+- colune send mesage to customer (default is fale or empty)
+
+================== RabbitMQ for Pub/Sub
+
+- RabbitMQ is open-source message broker វាប្រើ Protocol AMQP (Advance Message Queuing Protocol)- is specification 
+and RabbitMQ is implementation 
+
+- RabbitMQ also support Event Streaming (can see history) 
+
+Ex: OPP(specification) : Inheritent, Polimotithem, Abstraction, encupculation 
+
+-------------- AMQP have three:
+
+1. Producer: is the entity (ជាតួរអង្គដែលមានតួនាទីផ្ញើរសារ) - Know as publisher 
+2. Consumber អ្នកយក Message ទៅប្រើ know as subscriber 
+3. Message broker: middleware that receive message from producer and directs them to the appropriate consumer 
+
+Ex: 
+
+- Producer ->Message Broker <-- Consumer 
+
+- In side message broker have : Exchange, Queue1 ...queue2....
+
+Ex: similar to cloud is Amazone service - Lamba to do Pub/Sub
+
+================= In order to keep the business logi working we use 
+
++ Spring Cloud Function (libary that can help for Asynchonous communication) 
+
+- Spring cloud is build on top of the Java 8, namely supplier, function programming and Consumer. 
+
+- we use three: Supplier, Function and Consumer 
+
++ Supplier: is the function that produces output and no need input 
+--> it referred to Producer, Publicer, source 
+
++ Function : accepts input and generate output
+
++ Consumer: use input but no output (it called Subscriber or Sink)
+
+----------- why use Spring Cloud function features:
+
+- choice of programming styple-reactive, imperative or hybrid
+- POJO function (functionalInterface(have only abstract method)
+- មាន function ច្រើនយើងអាចដាក់បញ្ចូលគ្នាហើយ អោយវាដំណើរការម្តងទាំងអស់បានឮ
+- បាន REST end point (we add dependency then we have REST API) 
+- Streaming data (via Apache Kafka, Solace, RabbitMQ and More) 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
