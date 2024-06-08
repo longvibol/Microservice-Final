@@ -139,7 +139,7 @@ services:
         condition: service_healthy  
     environment:
       SPRING_APPLICATION_NAME: "gatewayserver"
-      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK-SET-URI: http://localhost:8080/realms/master/protocol/openid-connect/certs
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK-SET-URI: http://keycloak:8080/realms/master/protocol/openid-connect/certs
       OTEL_SERVICE_NAME: "gatewayserver"  
 
     extends:

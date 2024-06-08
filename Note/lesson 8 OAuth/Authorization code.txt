@@ -1,0 +1,134 @@
+Grant Type Flow:
+
+- Client Credential
+- Authorization Code 
+
+-----------------------------------------
+
+Authorization Code : we use Standard flow in Keycloak 
+
+- CRSF: ជាទូទៅ server វា block server ដែលមាន original​ ខុសគ្នាឬ port ខុសគ្នា
+-> Domain ខុសគ្នា can not access and Port diffent can not access 
+
+បើយើង deploy service របស់យើងនៅក្នុង abc.come ចឹងមានតែ doman abc នឹងទេដែលអាច Access វាបាន
+
+បើយើង បង្កើត  Anglola in port : localhost:websit:8080 យើងចង់មានទំនាក់២ ជាមួយ back end
+យើងត្រូវ allow ពី back end បានអាចទៅរួច
+
+---- In keycload we setup to allow CRSF for testing 
+
+Valid redirect URLs = *
+Web origins = * 
+
+
+===================================================
+
+Step to get Authorization Code 
+
+1-register Client with Auth server 
+
+GO To Clent -> create client -> select Client Authenticcation and Standard flow  
+
+2-creat user (user that in Auth server) = Keycloak 
+
+Go To Users-> Add User-> create user name and info -> Credentials create password 
+
+ex: vibol & 123
+
+
+
+=================== Testing with PostMain 
+
+Create Authorization with POSTMAIN 
+
+1. Create Authorization 
+- Request Headers 
+- Configure New Token:
++ Grant Type :Authentication Code 
++ Callback URL : where we want direct after confirm access token
++ Auth URL: http://localhost:9080/realms/master/protocol/openid-connect/auth
++ Access Token URL: http://localhost:9080/realms/master/protocol/openid-connect/token
++ Client ID : name that we create (vibol)
++ Client Secret : sdjlkfjwer
++ Scope: email openid profile
++ State: abcd-1234-edcg (it have formate but in POSTMAIN we can random)
++ Client Authentication: Send client credentials in body 
+
+
+* Step : after select the Get New Access Token - > it will open the Auth server to input : user name and passpord 
+
+Explian and summary:
+
+- Auth server : need have User Account and Client (applicaton need to register with Auth server first) 
+
+
+===================== 
+
+How to register users with Keycloak from API: 
+
+
+https://www.keycloak.org/docs-api/22.0.1/rest-api/index.html#_clients
+
+
+=================== How to mount keycload data 
+
+Keycload is the server that why we need DATA Store (it can be text file or data base) 
+- configuring the database keycload (keyword search)
+
+
+--> Keycloak database configuration : https://www.keycloak.org/server/db
+
+in java mostly we use Postgress database 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
