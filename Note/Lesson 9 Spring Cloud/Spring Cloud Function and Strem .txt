@@ -1,0 +1,55 @@
+Spring Cloud Function and Strem 
+
+1. Add Dependency (Auto Create REST API)
+
+<dependency>
+      <groupId>org.springframework.cloud</groupId>
+      <artifactId>spring-cloud-function-context</artifactId>
+    </dependency>
+
+<dependency>
+    <groupId>org.springframework.cloud</groupId>
+    <artifactId>spring-cloud-starter-function-web</artifactId>
+</dependency>
+
+---------------- 
+
+Example: 
+
+1. Create: CustomerMessageDTO
+
+@Data
+public class CustomerMessageDTO {
+	
+	private long customerId;
+	private String name;
+	private String email;
+	private String mobileNumber;
+
+}
+
+2. Create Functions:
+
+@Slf4j
+@Configuration
+public class MessageFunctions {
+	
+	@Bean
+	Function<CustomerMessageDTO, CustomerMessageDTO> email(){
+		return customerMsgDTO ->{
+			log.info("Sending email with this date: {}", customerMsgDTO);
+			return customerMsgDTO;
+		};
+	}
+	
+	@Bean
+	Function<CustomerMessageDTO, String> sms(){
+		return customerMsgDTO ->{
+			log.info("Sending sms with this number: {}", customerMsgDTO);
+			return customerMsgDTO.getMobileNumber();
+		};
+	}
+
+}
+
+
