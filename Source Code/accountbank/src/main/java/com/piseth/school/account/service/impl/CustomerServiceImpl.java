@@ -55,4 +55,11 @@ public class CustomerServiceImpl implements CustomerService {
 				orElseThrow(()-> new RuntimeException("Customer not found"));
 	}
 
+	@Override
+	public void updateCustomerCommunication(Long id) {
+		Customer customer = getById(id);
+		customer.setCommunicationAlreadySent(true);
+		customerRepository.save(customer);
+	}
+
 }

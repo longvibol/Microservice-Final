@@ -23,10 +23,15 @@ spring:
     console:
       enabled: true
   cloud:
+    function:
+      definition: updateCustomerCommunication
     stream:
       bindings:
         sendCommunication-out-0:
-          destination: send-communication 
+          destination: send-communication
+        updateCustomerCommunication-in-0:
+          destination: communication-sent
+          group: ${spring.application.name}
       
   rabbitmq:
     host: localhost
