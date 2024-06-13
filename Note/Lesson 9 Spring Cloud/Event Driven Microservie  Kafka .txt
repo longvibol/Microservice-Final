@@ -1,0 +1,114 @@
+Event Driven Microservie : Kafka 
+
+Messageing system: 
+
+- Apache Kafka 
+
++ event streaming platform 
++ handle large volume of data 
++ Data retention (ការរក្សា data) store data in Hard disk
++ រក្សាទិន្នន័យបានច្រើន
++ មានល្បឿនលឿន ហើយធ្វើការបានល្អ
++ Scalability : highly scalable 
+
+
+- RabbitMQ
+
++ Message broker
++ Handle small volume of data (Rounting system good)
++ Data retention (ការរក្សា data) store data in Memory
++ រក្សាទិន្នន័យបានតិចតួច
++ Limited scalability (add broker more : server ) ចង់អោយវាដើរកាន់តែលឿនត្រូវថែម server អោយកាន់តែច្រើនមក 
+
+---------------------------------------------------------
+
+Introduction to Kafka (concept)
+
+** Source of the data(Producers) ex: CD, DVD, Flash --> Receiver(Broker) ex: DVD player, computer --> Destination of Data (Consumers) ex: speaker, TV.. 
+
+- fault-tolerant: នៅពេលមាន component មួយមានបញ្ហា ប្រព័ន្ធទាំងមូលនៅមានដំណើរការបាន
+- គេប្រើវាដើម្បី build real-time streaming data pipelines 
+
+Example:
+
+passApp: they use Streaming data to real time tracking driver 
+
+
+------------------- Key concept : Kafka 
+
+1. Producers: មានតួនាទីបង្កើត Message ទៅអោយ kafka topics( project-> topic -> topic's log
+
+2. Topics: Ex phone shop, they create topic product so when the customer by it send to topic produce 
+- it divide into partictions (it have offset id-ជាលេខសំគាល់ របស់ topic មួយនឹង) 
+
+3. Brokers: is the Kafka servers that manage the storage and replication of the topics. 
+ex: ជាទូទៅគេធ្វើវា មានចំនួន ៣ server ដើម្បីទិន្នន័យរបស់យើងកុំអោយបាត់ 
+- replication (ទិន្នន័យដូចគ្នា)
+
+4. Partitiions: Topics can work in parellel ហើយវាមាន sequence number មិនអាចកែប្រែបាន
+- យើងជាក្រុមហ៊ុដឹក ជញ្ជូន ចឹងយើងបង្កើត Patition to each country:
+ex: 
+- Cambodia is patition Cambodia;
+- USA patition Usa 
+
+=> ចឹងមានន័យថា Product ដូចគ្នាមែនតែយើងបញ្ជូនវាទៅតាមតំបន់ ហើយវាអាចធ្វើការក្នុងពេលតែមួយបាន 
+
+5. Offset: unique identifiers assigned to each message within a partition
+គេប្រើវាដើម្បី តាមដាន់ tracking progress
+- Consumers can control their offsets
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
