@@ -1,7 +1,7 @@
 version: "3.8"
 services:
 
-rabbit:
+  rabbit:
     image: rabbitmq:3.12-management
     hostname: rabbitmq
     ports:
@@ -17,8 +17,8 @@ rabbit:
       file: common.yml
       service: ms-deploy-network
 
-   message:
-    image: pisethbank/message:v2
+  message:
+    image: vibollong/message:v2
     container_name: message-ms
     depends_on:
       rabbit:
