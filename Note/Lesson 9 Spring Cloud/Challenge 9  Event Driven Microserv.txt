@@ -135,7 +135,7 @@ Ex: similar to cloud is Amazone service - Lamba to do Pub/Sub
 
 - choice of programming styple-reactive, imperative or hybrid
 - POJO function (functionalInterface(have only abstract method)
-- មាន function ច្រើនយើងអាចដាក់បញ្ចូលគ្នាហើយ អោយវាដំណើរការម្តងទាំងអស់បានឮ
+- មាន function ច្រើនយើងអាចដាក់បញ្ចូលគ្នាហើយ អោយវាដំណើរការម្តងទាំងអស់បាន compose function 
 - បាន REST end point (we add dependency then we have REST API) 
 - Streaming data (via Apache Kafka, Solace, RabbitMQ and More) 
 

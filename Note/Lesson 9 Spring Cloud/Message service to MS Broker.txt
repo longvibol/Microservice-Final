@@ -1,0 +1,73 @@
+1. តំបូង ពេលគេមកបង្កើត គណនី រួចរាល់ហើយ Message Service យើងវាបាន រក្សាទិន្នន័យទុករួចរាល់ ចឹងយើងអោយវា បង្កើត ​Event មួយឈ្មោះថា 
+
+log.info("Sending communication request for the details: {}", customerMessageDTO);
+		var result = streamBridge.send("sendCommunication-out-0", customerMessageDTO);
+		log.info("Is the communication request successfully trigger?: {}",result);
+
+ការងារ មកចុះឈ្មោះនឹងវាជោកជ័យហើយ តែខាងក្រោយ in backgroud Message service need to send the message back to Account : emial or sms ទៅគេវិញ
+ថាគណនីរបស់លោកអ្នកបានបង្កើតដោយជោគជ័យហើយ 
+
+---- Now we create the respond back to the Customer Account that your Account have create successfully 
+
+Account (name, email, phone,...., communication_already_sent) -> Message Broker <- Message (send email, or send SMS)
+
+Message service -> Message Broker <- Account (update table in acount) : update colum communication_already_sent to true) 
+
+
+
+1. Add config in Message service
+
+spring.cloud.stream.bindings.emailsms-in-0.destination=send-communication (ពេលយើងទទួល គេហៅថា Qurue ) 
+spring.cloud.stream.bindings.emailsms-in-0.group=${spring.application.name}
+
+spring.cloud.stream.bindings.emailsms-out-0.destination=communication-sent (ពេលផ្ញើរត្រលប់ទៅវិញ គេហៅថា Exchagne)
+spring.cloud.stream.bindings.emailsms-out-0.group=${spring.application.name} 
+
+
+2. In Account service : need to crate table and send it to null
+
+public class Customer {
+	
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long customerId;
+	private String name;
+	private String email;
+	private String mobileNumber;
+	private LocalDate createDate;
+	private Boolean communicationAlreadySent;
+
+}
+
+Note in the ture or flase : 
+- Boolean ( Big letter B is object) so it can recived null
+- boolean ( វាជា premative type so it can not assign null) 
+
+solution we need put Boolean (object type) 
+
+- Colum ដែលបង្កើតថ្មី គឺវា null 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

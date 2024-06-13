@@ -1,0 +1,243 @@
+Crate Message qure in Rabbit MQ 
+
+1. Add dependancy 
+
+<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-devtools</artifactId>
+			<scope>runtime</scope>
+			<optional>true</optional>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-stream</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-stream-binder-rabbit</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>
+			<optional>true</optional>
+		</dependency>
+
+
+=================== in side spring-cloud-stream it have spring-cloud-function alrady (Create REST API)
+
+* Now we want to implement our account service when it success it send the messasge to Message service :
+
+Implementataion:
+
+Account Service (Push notification to) -> Message Broker <- Message Service (Listen)
+
+- Account : destination : exchange name 
+- Message : destination : queue name 
+
+
+Step to create message queue :
+
+1. Think about where we create message : In the account 
+
+
+In Account service:
+
+1. Crate customrMessageDTO 
+
+2. in Controller crate function call server to  Message service 
+
+------------------------
+
+@Override
+	public Customer save(Customer customer) {
+		customer = customerRepository.save(customer);
+		sendCommunication(customer);
+		return customer;
+
+	}
+	
+	// function to check the message successfull or not ? 
+	
+	private void sendCommunication(Customer customer) {
+		CustomerMessageDTO customerMessageDTO = new CustomerMessageDTO(customer.getCustomerId(), 
+				customer.getName(), customer.getEmail(), customer.getMobileNumber());
+		
+		log.info("Sending communication request for the details: {}", customerMessageDTO);
+		var result = streamBridge.send("sendCommunication-out-0", customerMessageDTO);
+		log.info("Is the communication request successfully trigger?: {}",result);
+		
+		
+	}
+
+-----------------------
+
+3. Add application. properto to message service 
+
+cloud:
+    stream:
+      bindings:
+        sendCommunication-out-0:
+          destination: send-communication 
+
+Note:
+destination: send-communication : "send-communication" គេហៅវាជា Exchagne Name
+
+
+
+4. setup Rabbit MQ 
+
+Add property: 
+
+rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
+    connection-timeout: 10s
+
+------------------------------
+
+In side message service: 
+
+1. Add property:
+
+spring.cloud.stream.bindings.emailsms-in-0.destination=send-communication
+spring.cloud.stream.bindings.emailsms-in-0.group=${spring.application.name}
+
+explan: 
+
++ spring.cloud.stream.bindings.emailsms-in-0.destination=send-communication
+- spring.cloud.stream.bindings យើងប្រើ Spring Cloud stream 
+- .emailsms : គឺជា composite function របស់យើង ពេលវា ធ្វើការ វានឹង​ ហៅ function របស់យើងមកប្រើ
+
+- -in-0  (in = input ) and -0 is the index 
+- destination=send-communication :  "send-communication" វាជា qure name
+
+
++ spring.cloud.stream.bindings.emailsms-in-0.group=${spring.application.name}
+
+- .group=${spring.application.name} ដើម្បី Group Message data នឹង
+
+
+
+
+---------------------------------------
+
+# latest RabbitMQ 3.13
+
+
+docker run -it --rm -d --name rabbitmq -p 5672:5672 -p 15672:15672 rabbitmq:3.13-management
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
