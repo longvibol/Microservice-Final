@@ -10,7 +10,7 @@
 		<relativePath /> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.piseth.bank</groupId>
-	<artifactId>Message</artifactId>
+	<artifactId>message</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>Message</name>
 	<description>Demo Message spring boot cloud project for Spring Boot</description>
