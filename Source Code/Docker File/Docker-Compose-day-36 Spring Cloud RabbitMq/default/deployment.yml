@@ -9,28 +9,27 @@ services:
       - "15672:15672"
     healthcheck:
       test: rabbitmq-diagnostics check_port_connectivity
-      interval: 20s
-      timeout: 20s
-      retries: 20
+      interval: 10s
+      timeout: 10s
+      retries: 10
       start_period: 10s
     extends:
       file: common.yml
       service: ms-deploy-network
 
-  postgres: 
-    image: postgres:16   
-    environment:
-      # Environment Variables expecially for Postgres
-      POSTGRES_DB: kdb
-      POSTGRES_USER: kadmin
-      POSTGRES_PASSWORD: kadmin
-    healthcheck:
-      test: "exit 0"
-    volumes:
-      - ./postgres-data:/var/lib/postgresql
-    extends:
-      file: common.yml
-      service: ms-deploy-network
+  # postgres: 
+  #   image: postgres:16   
+  #   environment:
+  #     POSTGRES_DB: kdb
+  #     POSTGRES_USER: kadmin
+  #     POSTGRES_PASSWORD: kadmin
+  #   healthcheck:
+  #     test: "exit 0"
+  #   volumes:
+  #     - ./postgres-data:/var/lib/postgresql/data
+  #   extends:
+  #     file: common.yml
+  #     service: ms-deploy-network
 
   keycloak:
     image: quay.io/keycloak/keycloak:24.0.4
@@ -40,16 +39,7 @@ services:
     environment:
       KEYCLOAK_ADMIN: "admin"
       KEYCLOAK_ADMIN_PASSWORD: "admin"
-      KC_DB: postgres
-      KC_DB_URL_HOST: postgres
-      KC_DB_URL_DATABASE: kdb
-      KC_DB_PASSWORD: kadmin
-      KC_DB_USERNAME: kadmin
-      KC_DB_SCHEMA: public
     command: "start-dev"
-    depends_on:      
-      postgres:
-        condition: service_healthy
     extends:
       file: common.yml
       service: ms-deploy-network  
@@ -199,4 +189,4 @@ services:
       file: common.yml
       service: ms-base-eurekaserver
 networks:
-  vibolbanknet:
+  pisethbanknet:

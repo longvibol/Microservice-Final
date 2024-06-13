@@ -1,7 +1,7 @@
 services:
   ms-deploy-network:
     networks:
-      - vibolbanknet
+      - pisethbanknet
 
   ms-base:
     extends: ms-deploy-network

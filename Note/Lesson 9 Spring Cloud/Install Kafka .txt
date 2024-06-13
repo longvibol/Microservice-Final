@@ -1,0 +1,18 @@
+Install Kafka 
+
+https://www.youtube.com/watch?v=BwYFuhVhshI
+
+
+1. Go to Kafka folder then cmd to run: zookeeper(server resource)
+
+.\bin\windows\zookeeper-server-start.bat .\config\zookeeper.properties
+
+
+2. .\bin\windows\kafka-server-start.bat .\config\server.properties
+
+3. start : producter and consumer 
+
+- create topic(table in relational database)
+
+
+
